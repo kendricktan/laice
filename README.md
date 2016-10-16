@@ -13,8 +13,10 @@
 ---
 
 ### What?
-<p>Laice allows you to build, train, and classify your own sentences via a Web UI. Laice can also communicate with your applications through a RESTful API.</p>
-<p style="font-size: 10px">In other words, laice aims to be a free, open sourced alternative to  <a href="http://wit.ai">api.ai</a>, <a href="http://wit.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a></p>
+Laice allows you to build, train, and classify your own sentences via a Web UI. 
+Laice can also communicate with your applications through a RESTful API.
+
+In other words, laice aims to be a free, open sourced alternative to  <a href="http://wit.ai">api.ai</a>, <a href="http://wit.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a>
 
 ---
  
