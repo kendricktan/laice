@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "react": "^15.3.2",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "material-design-lite": "^1.2.1"
   }
 }
