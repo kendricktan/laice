@@ -1,6 +1,6 @@
 <p align="center">
   <a href="#">
-    <img alt="laice" src="https://i.imgur.com/6AVzkPZ.png" width="128"><br/>    
+    <img alt="laice" src="https://i.imgur.com/HmvI1JP.png" width="128"><br/>    
   </a>
   <span style="font-size:8px">Icon by <a style="font-size:8px" href="http://www.flaticon.com/authors/simpleicon">simpleicons</a></span>
 </p>
