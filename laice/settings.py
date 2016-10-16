@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Pipeline
-    'pipeline',
+    # Home
+    'home',
 
     # DRF
     'rest_framework',
@@ -62,7 +62,9 @@ ROOT_URLCONF = 'laice.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [
+            os.path.normpath(os.path.join(BASE_DIR, 'templates')),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,4 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'static'))
+os.path.normpath(os.path.join(BASE_DIR, 'staticfiles')),
+
+STATICFILES_DIRS = [
+    os.path.normpath(os.path.join(BASE_DIR, 'static')),
+]
