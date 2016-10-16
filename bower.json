@@ -1,0 +1,21 @@
+{
+  "name": "laice",
+  "description": "(Frontend) Train your own Natural Language Processor straight from your browser!",
+  "main": "",
+  "authors": [
+    "Kendrick Tan kendricktan0814@gmail.com"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/kendricktan/laice",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "^15.3.2",
+    "bootstrap": "^3.3.7"
+  }
+}
