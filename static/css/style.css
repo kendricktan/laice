@@ -21,3 +21,9 @@
 .full-width {
     width: 100%;
 }
+
+.attribute-select{
+    margin-left: 10px;
+    margin-right: 10px;
+    min-width: 50%;
+}

@@ -40,7 +40,7 @@
             <nav class="mdl-navigation mdl-layout--large-screen-only">
                 <a class="mdl-navigation__link" href="{% url 'dashboard_view' %}">Dashboard</a>
                 <a class="mdl-navigation__link" href="{% url 'stories_view' %}">Stories</a>
-                <a class="mdl-navigation__link" href="">Help</a>
+                <a class="mdl-navigation__link" href="{% url 'help_view' %}">Help</a>
             </nav>
         </div>
     </header>
@@ -49,7 +49,7 @@
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="{% url 'dashboard_view' %}">Dashboard</a>
             <a class="mdl-navigation__link" href="{% url 'stories_view' %}">Stories</a>
-            <a class="mdl-navigation__link" href="#">Help</a>
+            <a class="mdl-navigation__link" href="{% url 'help_view' %}">Help</a>
         </nav>
     </div>
 
@@ -80,8 +80,10 @@
 </div>
 
 <!-- scripts -->
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'bower_components/react/react.min.js' %}"></script>
 <script src="{% static 'bower_components/react/react-dom.min.js' %}"></script>
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'bower_components/material-design-lite/material.min.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
 </body>

@@ -7,9 +7,9 @@
     <div class="navigation-card-wide mdl-card mdl-shadow--2dp">
         <div class="mdl-card__title">
             <h2 class="mdl-card__title-text">
-                <a href="">Stories</a>
+                <a href="{% url 'stories_view' %}">Stories</a>
                 &nbsp; > &nbsp;
-                <a href=""> {{ story_name }} </a>
+                <a href="{% url 'inner_story_view' story_name=story_name %}"> {{ story_name }} </a>
             </h2>
         </div>
     </div>
@@ -17,45 +17,159 @@
     <br/>
 
     <div class="generic-card-wide mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__supporting-text">
-            <h3 class="mdl-card__title-text">Add a new story</h3>
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Attributes</h2>
+        </div>
+
+        <div style="width: 100%" class="mdl-card__supporting-text">
+
+            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp full-width">
+                <thead>
+                <tr>
+                    <th class="mdl-data-table__cell--non-numeric full-width">Attributes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric"><a href="#">action</a></td>
+                </tr>
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric"><a href="#">location</a></td>
+                </tr>
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric"><a href="#">target</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <br/>
+
+            <button style="margin-top: 16px"
+                    class="pull-right mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                Delete selected attributes
+            </button>
+
             <form action="#">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                     <input class="mdl-textfield__input" type="text" id="story_name_input">
-                    <label class="mdl-textfield__label" for="story_name_input">Story name here...</label>
+                    <label class="mdl-textfield__label" for="story_name_input">Attribute...</label>
                 </div>
 
-                <button style="margin-left: 15px" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                <button style="margin-left: 15px"
+                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
                     Add
                 </button>
             </form>
+
         </div>
     </div>
 
     <br/>
 
-    <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp full-width">
-        <thead>
-        <tr>
-            <th class="mdl-data-table__cell--non-numeric full-width">Stories</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td class="mdl-data-table__cell--non-numeric"><a href="#">Acrylic (Transparent)</a></td>
-        </tr>
-        <tr>
-            <td class="mdl-data-table__cell--non-numeric"><a href="#">Plywood (Birch)</a></td>
-        </tr>
-        <tr>
-            <td class="mdl-data-table__cell--non-numeric"><a href="#">Laminate (Gold on Blue)</a></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="generic-card-wide mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+            <div class="mdl-card__supporting-text">
+                Turn off the bathroom lights
+            </div>
+            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Delete
+            </button>
+            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Expand
+            </button>
+        </div>
 
-    <br/>
+        <div class="mdl-card__actions mdl-card--border">
+            <table class="mdl-data-table mdl-js-data-table full-width">
+                <thead>
+                <tr>
+                    <th class="mdl-data-table__cell--non-numeric">Attribute</th>
+                    <th class="mdl-data-table__cell--non-numeric">Section</th>
+                    <th class="mdl-data-table__cell--non-numeric">Remove</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <select class="form-control" id="sel1">
+                            <option>action</option>
+                            <option>location</option>
+                            <option>target</option>
+                        </select>
+                    </td>
+                    <td class="mdl-data-table__cell--non-numeric">Turn off</td>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-1">
+                            <input type="checkbox" id="checkbox-1" class="mdl-checkbox__input">
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <select class="form-control" id="sel2">
+                            <option>action</option>
+                            <option>location</option>
+                            <option>target</option>
+                        </select>
+                    </td>
+                    <td class="mdl-data-table__cell--non-numeric">bathroom</td>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-2">
+                            <input type="checkbox" id="checkbox-2" class="mdl-checkbox__input">
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <select class="form-control" id="sel3">
+                            <option>action</option>
+                            <option>location</option>
+                            <option>target</option>
+                        </select>
+                    </td>
+                    <td class="mdl-data-table__cell--non-numeric">lights</td>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-3">
+                            <input type="checkbox" id="checkbox-3" class="mdl-checkbox__input">
+                        </label>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-    <button class="pull-right mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-        Delete selected stories
-    </button>
+        </div>
+
+        <div class="mdl-card__actions mdl-card--border">
+            <form class="form-inline" action="#">
+
+
+                <select class="attribute-select form-control" id="sel4">
+                    <option>action</option>
+                    <option>location</option>
+                    <option>target</option>
+                </select>
+
+
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="story_name_input">
+                    <label class="mdl-textfield__label" for="story_name_input">Section...</label>
+                </div>
+
+                <button class="pull-right mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                    Add
+                </button>
+            </form>
+        </div>
+
+        <div class="mdl-card__actions mdl-card--border">
+            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Hide
+            </button>
+            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                Update
+            </button>
+        </div>
+    </div>
+
+
 {% endblock content %}
