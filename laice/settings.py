@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Home
-    'home',
+    # Our apps
+    'dashboard',
+    'stories',
 
     # DRF
     'rest_framework',
