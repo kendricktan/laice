@@ -8,9 +8,10 @@
     <title>{% block webpage_title %}{% endblock %}</title>
     <!-- styles -->
     {% load static %}
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" type="text/css"
           href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/material.lime-pink.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/material.teal-pink.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
@@ -33,7 +34,7 @@
     <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
             <!-- Title -->
-            <span class="mdl-layout-title"><a href="#"><img src="https://i.imgur.com/SA11If3.png" height=30/></a></span>
+            <span class="mdl-layout-title"><a href="{% url 'dashboard_view' %}"><img src="https://i.imgur.com/SA11If3.png" height=30/></a></span>
             <!-- Add spacer, to align navigation to the right -->
             <div class="mdl-layout-spacer"></div>
             <!-- Navigation. We hide it in small screens. -->
@@ -45,7 +46,7 @@
         </div>
     </header>
     <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title"><a href="#"><img src="https://i.imgur.com/SA11If3.png" height=30/></a></span>
+        <span class="mdl-layout-title"><a href="{% url 'dashboard_view' %}"><img src="https://i.imgur.com/SA11If3.png" height=30/></a></span>
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="{% url 'dashboard_view' %}">Dashboard</a>
             <a class="mdl-navigation__link" href="{% url 'stories_view' %}">Stories</a>

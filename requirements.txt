@@ -1,4 +1,4 @@
 Cython==0.24.1
 Django==1.10.2
 djangorestframework==3.4.7
-fasttext==0.8.0
+spacy==1.0.4

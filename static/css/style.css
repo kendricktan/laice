@@ -1,3 +1,8 @@
+/* Font */
+*{
+    font-family: 'Roboto', sans-serif;
+}
+
 /* Cards */
 .generic-card-wide.mdl-card {
     width: 100%;
