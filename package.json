@@ -14,12 +14,17 @@
   },
   "homepage": "https://github.com/kendricktan/laice#readme",
   "dependencies": {
+    "babel-plugin-transform-react-jsx": "^6.8.0",
     "bower": "^1.7.9",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
     "gulp-browser": "^3.0.2",
     "gulp-size": "^2.1.0",
-    "reactify": "^1.1.1"
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "reactify": "^1.1.1",
+    "request": "^2.75.0"
   },
   "devDependencies": {
     "bower": "^1.7.9"

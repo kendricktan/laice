@@ -5,6 +5,10 @@ from django.db import models
 class Story(models.Model):
     name = models.CharField(max_length=128, unique=True)
 
+    @property
+    def unconfigured_requests(self):
+        return self.query_set.filter(configured=False).count()
+
     def save(self, *args, **kwargs):
         if self.name:
             self.name = self.name.replace(' ', '')
@@ -27,3 +31,6 @@ class Query(models.Model):
 
     # A query can have many attributes
     attribute = models.ManyToManyField(StoryAttribute)
+
+    # Has the querystring been configured
+    configured = models.BooleanField(default=False)

@@ -68,10 +68,15 @@
 </div>
 
 <!-- scripts -->
+<script>
+    var DOMAIN = "http://{{ request.get_host }}/";
+</script>
 <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'bower_components/react/react.min.js' %}"></script>
 <script src="{% static 'bower_components/react/react-dom.min.js' %}"></script>
 <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/stories.js' %}"></script>
+{% block end_extra_scripts %}
+{% endblock %}
 </body>
 </html>
