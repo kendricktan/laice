@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Our apps
+    'api',
     'dashboard',
     'help',
     'stories',
