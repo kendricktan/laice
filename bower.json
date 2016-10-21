@@ -18,5 +18,7 @@
     "react": "^15.3.2",
     "bootstrap": "^3.3.7",
     "material-design-lite": "^1.2.1",
+    "semantic": "semantic-ui#^2.2.4",
+    "semantic-ui-dropdown": "^2.2.3"
   }
 }

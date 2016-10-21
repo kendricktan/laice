@@ -103,4 +103,4 @@ def get_ner_from_load(phrase, model_dir=None):
 
 if __name__ == '__main__':
     get_ner('Give me those bottles', 'new_model')
-    get_ner_from_load('Give me those bottles' ,'new_model')
+    get_ner_from_load('Get me those chopsticks', 'new_model')
