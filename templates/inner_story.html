@@ -1,183 +1,158 @@
 {% extends "generic.html" %}
+{% block stories_active %} active {% endblock %}
+
 {% block webpage_title %}
-    laice | {{ story_name }}
+    Laice | {{ story_name }}
 {% endblock %}
 
 {% block content %}
-    <div class="navigation-card-wide mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text">
-                <a href="{% url 'stories_view' %}">Stories</a>
-                &nbsp; > &nbsp;
-                <a href="{% url 'inner_story_view' story_name=story_name %}"> {{ story_name }} </a>
-            </h2>
-        </div>
+    <div class="well">
+        <h3>
+            <a href="{% url 'stories_view' %}">Stories</a>
+            &nbsp; > &nbsp;
+            <a href="{% url 'inner_story_view' story_name=story_name %}"> {{ story_name }} </a>
+
+            <button type="button" class="pull-right btn btn-danger">Delete Story</button>
+        </h3>
     </div>
 
     <br/>
 
-    <div class="generic-card-wide mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text">Attributes</h2>
-        </div>
+    <div class="well">
 
-        <div style="width: 100%" class="mdl-card__supporting-text">
+        <h2>Attributes</h2>
+        <hr/>
 
-            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp full-width">
-                <thead>
-                <tr>
-                    <th class="mdl-data-table__cell--non-numeric full-width">Attributes</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric"><a href="#">action</a></td>
-                </tr>
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric"><a href="#">location</a></td>
-                </tr>
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric"><a href="#">target</a></td>
-                </tr>
-                </tbody>
-            </table>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Attribute</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row"><a href="#">action</a></th>
+                <th>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </th>
+            </tr>
+            <tr>
+                <th scope="row"><a href="#">object</a></th>
+                <th>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </th>
+            </tr>
+            <tr>
+                <th scope="row"><input type="text" class="form-control" placeholder="Attribute"></th>
+                <th>
+                    <button type="submit" class="btn btn-block btn-success">Add</button>
+                </th>
+            </tr>
+            </tbody>
+        </table>
+        <hr/>
 
-            <br/>
-
-            <button style="margin-top: 16px"
-                    class="pull-right mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                Delete selected attributes
-            </button>
-
-            <form action="#">
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="story_name_input">
-                    <label class="mdl-textfield__label" for="story_name_input">Attribute...</label>
-                </div>
-
-                <button style="margin-left: 15px"
-                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                    Add
-                </button>
-            </form>
-
-            <div class="mdl-card__actions mdl-card--border">
-                <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                    Hide
-                </button>
-                <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                    Update
-                </button>
-            </div>
-        </div>
     </div>
 
     <br/>
-
-    <div class="generic-card-wide mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-            <div class="mdl-card__supporting-text">
-                Turn off the bathroom lights
-            </div>
-            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                Delete
-            </button>
-            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                Expand
-            </button>
-        </div>
-
-        <div class="mdl-card__actions mdl-card--border">
-            <table class="mdl-data-table mdl-js-data-table full-width">
-                <thead>
-                <tr>
-                    <th class="mdl-data-table__cell--non-numeric">Attribute</th>
-                    <th class="mdl-data-table__cell--non-numeric">Section</th>
-                    <th class="mdl-data-table__cell--non-numeric">Remove</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <select class="form-control" id="sel1">
-                            <option>action</option>
-                            <option>location</option>
-                            <option>target</option>
-                        </select>
-                    </td>
-                    <td class="mdl-data-table__cell--non-numeric">Turn off</td>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-1">
-                            <input type="checkbox" id="checkbox-1" class="mdl-checkbox__input">
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <select class="form-control" id="sel2">
-                            <option>action</option>
-                            <option>location</option>
-                            <option>target</option>
-                        </select>
-                    </td>
-                    <td class="mdl-data-table__cell--non-numeric">bathroom</td>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-2">
-                            <input type="checkbox" id="checkbox-2" class="mdl-checkbox__input">
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <select class="form-control" id="sel3">
-                            <option>action</option>
-                            <option>location</option>
-                            <option>target</option>
-                        </select>
-                    </td>
-                    <td class="mdl-data-table__cell--non-numeric">lights</td>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-3">
-                            <input type="checkbox" id="checkbox-3" class="mdl-checkbox__input">
-                        </label>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-        </div>
-
-        <div class="mdl-card__actions mdl-card--border">
-            <form class="form-inline" action="#">
+    <hr/>
+    <br/>
 
 
-                <select class="attribute-select form-control" id="sel4">
-                    <option>action</option>
-                    <option>location</option>
-                    <option>target</option>
-                </select>
-
-
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="story_name_input">
-                    <label class="mdl-textfield__label" for="story_name_input">Section...</label>
-                </div>
-
-                <button class="pull-right mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                    Add
-                </button>
-            </form>
-        </div>
-
-        <div class="mdl-card__actions mdl-card--border">
-            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                Hide
-            </button>
-            <button class="pull-right mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                Update
-            </button>
-        </div>
+    <div class="pull-right btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+            View: unconfigured <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#">View: unconfigured</a></li>
+            <li><a href="#">View: configured</a></li>
+            <li><a href="#">View: all</a></li>
+        </ul>
     </div>
 
+    <br/>
+    <br/>
+    <br/>
+
+    <div class="well">
+        <h4><span class="glyphicon glyphicon-ok"></span>&nbsp;Get me some beer</h4>
+        <hr/>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Text</th>
+                <th>Attribute</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">Get</th>
+                <th>action</th>
+                <th>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </th>
+            </tr>
+            <tr>
+                <th scope="row">beer</th>
+                <th>object</th>
+                <th>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </th>
+            </tr>
+            <tr>
+                <th><input type="text" class="form-control" placeholder="text"></th>
+                <th>
+                    <select class="form-control">
+                        <option value="one">action</option>
+                        <option value="two">object</option>
+                    </select>
+                </th>
+                <th>
+                    <button type="button" class="btn btn-success">Add</button>
+                </th>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="well">
+        <h4><span class="glyphicon glyphicon-remove"></span>&nbsp;Get me some shoes</h4>
+        <hr/>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Text</th>
+                <th>Attribute</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tr>
+                <th scope="row">Get</th>
+                <th>action</th>
+                <th>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </th>
+            </tr>
+            <tr>
+                <th><input type="text" class="form-control" placeholder="text"></th>
+                <th>
+                    <select class="form-control">
+                        <option value="one">action</option>
+                        <option value="two">object</option>
+                    </select>
+                </th>
+                <th>
+                    <button type="button" class="btn btn-success">Add</button>
+                </th>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
 {% endblock content %}

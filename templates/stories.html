@@ -1,59 +1,50 @@
 {% extends "generic.html" %}
+{% block stories_active %} active {% endblock %}
+
 {% block webpage_title %}
-    laice | stories
+    Laice | stories
 {% endblock %}
 
 {% block content %}
-    <div class="navigation-card-wide mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text">
-                <a href="{% url 'stories_view' %}">Stories</a>
-            </h2>
-        </div>
+    <div class="well">
+        <h3>
+            <a href="{% url 'stories_view' %}">Stories</a>
+        </h3>
     </div>
 
+
     <br/>
 
-    <div class="generic-card-wide mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__supporting-text">
-            <h3 class="mdl-card__title-text">Add a new story</h3>
-            <form action="#">
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="story_name_input">
-                    <label class="mdl-textfield__label" for="story_name_input">Story name here...</label>
-                </div>
+    <div class="well">
+        <h2>Story List</h2>
+        <hr/>
+        <table class="table">
+            <thead class="thead-default">
+            <tr>
+                <th>Story</th>
+                <th>Unconfigured requests</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row"><a href="#">The real potatoes</a></th>
+                <td>12</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="#">Nom nom nom</a></th>
+                <td>13</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="#">Nyan cat</a></th>
+                <td>14</td>
+            </tr>
+            </tbody>
+        </table>
 
-                <button style="margin-left: 15px" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                    Add
-                </button>
-            </form>
-        </div>
+        <form>
+            <input type="text" class="form-control" placeholder="Story name"><br/>
+            <button type="submit" class="btn btn-block btn-default btn-success">Add</button>
+        </form>
+
     </div>
-
-    <br/>
-
-    <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp full-width">
-        <thead>
-        <tr>
-            <th class="mdl-data-table__cell--non-numeric full-width">Stories</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td class="mdl-data-table__cell--non-numeric"><a href="#">Acrylic (Transparent)</a></td>
-        </tr>
-        <tr>
-            <td class="mdl-data-table__cell--non-numeric"><a href="#">Plywood (Birch)</a></td>
-        </tr>
-        <tr>
-            <td class="mdl-data-table__cell--non-numeric"><a href="#">Laminate (Gold on Blue)</a></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <br/>
-
-    <button class="pull-right mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-        Delete selected stories
-    </button>
 {% endblock content %}

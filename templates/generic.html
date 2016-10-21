@@ -9,11 +9,8 @@
     <!-- styles -->
     {% load static %}
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <link rel="stylesheet" type="text/css"
-          href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/material.teal-pink.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
         #view-source {
             position: fixed;
@@ -30,54 +27,44 @@
 </head>
 <body>
 
-<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-    <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
-            <!-- Title -->
-            <span class="mdl-layout-title"><a href="{% url 'dashboard_view' %}"><img src="https://i.imgur.com/SA11If3.png" height=30/></a></span>
-            <!-- Add spacer, to align navigation to the right -->
-            <div class="mdl-layout-spacer"></div>
-            <!-- Navigation. We hide it in small screens. -->
-            <nav class="mdl-navigation mdl-layout--large-screen-only">
-                <a class="mdl-navigation__link" href="{% url 'dashboard_view' %}">Dashboard</a>
-                <a class="mdl-navigation__link" href="{% url 'stories_view' %}">Stories</a>
-                <a class="mdl-navigation__link" href="{% url 'help_view' %}">Help</a>
-            </nav>
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Laice</a>
         </div>
-    </header>
-    <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title"><a href="{% url 'dashboard_view' %}"><img src="https://i.imgur.com/SA11If3.png" height=30/></a></span>
-        <nav class="mdl-navigation">
-            <a class="mdl-navigation__link" href="{% url 'dashboard_view' %}">Dashboard</a>
-            <a class="mdl-navigation__link" href="{% url 'stories_view' %}">Stories</a>
-            <a class="mdl-navigation__link" href="{% url 'help_view' %}">Help</a>
-        </nav>
-    </div>
 
-    <!-- Content -->
-    <main class="mdl-layout__content">
-        <div class="page-content">
-            <div class="mdl-grid">
-                <div class="mdl-cell mdl-cell--2-col"></div>
-                <div class="mdl-cell mdl-cell--8-col">
-                    {% block content %}
-                    {% endblock %}
-                </div>
-                <div class="mdl-cell mdl-cell--2-col"></div>
-            </div>
-        </div>
-    </main>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="{% block dashboard_active %}{% endblock %}"><a href="{% url 'dashboard_view' %}">Dashboard</a></li>
+                <li class="{% block stories_active %}{% endblock %}"><a href="{% url 'stories_view' %}">Stories</a></li>
 
-    <footer class="mdl-mini-footer">
-        <div class="mdl-mini-footer__left-section">
-            <ul class="mdl-mini-footer__link-list">
-                <li><a href="#">T&C</a></li>
-                <li><a href="#">Help</a></li>
-                <li><a href="#">Contributing</a></li>
-                <li><a href="#">Donate</a></li>
             </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="{% block about_active %}{% endblock %}"><a href="#">About</a></li>
+                <li class="{% block help_active %}{% endblock %}"><a href="{% url 'help_view' %}">Help</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            {% block content %}
+            {% endblock %}
         </div>
-    </footer>
+        <div class="col-md-2"></div>
+    </div>
 </div>
 
 <!-- scripts -->
@@ -85,7 +72,6 @@
 <script src="{% static 'bower_components/react/react.min.js' %}"></script>
 <script src="{% static 'bower_components/react/react-dom.min.js' %}"></script>
 <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-<script src="{% static 'bower_components/material-design-lite/material.min.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
