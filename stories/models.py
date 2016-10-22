@@ -25,7 +25,7 @@ class Story(models.Model):
 
     def save(self, *args, **kwargs):
         self.perform_clean()
-        super(Story, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -56,7 +56,7 @@ class StoryAttribute(models.Model):
 
     def save(self, *args, **kwargs):
         self.perform_clean()
-        super(StoryAttribute, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.attribute + ' | ' + str(self.story)
@@ -70,14 +70,11 @@ class Query(models.Model):
     # Each query will belong to a story
     story = models.ForeignKey(Story, null=False)
 
-    # A query can have many attributes
-    attributes = models.ManyToManyField(StoryAttribute)
-
     # Has the querystring been configured
+    # by configured I mean manually parsed
     configured = models.BooleanField(default=False)
 
-    # If it's configured then we'll need to store its mapping fields
-    # Named entity recognizier via Spacy
+    # Store it's named entity recognizier via Spacy
     parsed_ner = JSONField(blank=True, null=True)
 
     def __str__(self):

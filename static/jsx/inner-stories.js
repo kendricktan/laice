@@ -221,7 +221,7 @@ var ManualQuery = React.createClass({
 
     render: function () {
         return (
-            <form onSubmit={this.handleSubmit()}>
+            <form onSubmit={this.handleSubmit}>
                 <p><input type="text" placeholder="'Turn the temperature down by 2 degrees'" className="form-control"/>
                 </p>
                 <button type="submit" className="btn btn-block btn-default btn-primary">Query</button>

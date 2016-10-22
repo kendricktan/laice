@@ -20979,7 +20979,7 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
 
     render: function () {
         return (
-            React.createElement("form", {onSubmit: this.handleSubmit()}, 
+            React.createElement("form", {onSubmit: this.handleSubmit}, 
                 React.createElement("p", null, React.createElement("input", {type: "text", placeholder: "'Turn the temperature down by 2 degrees'", className: "form-control"})
                 ), 
                 React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Query")

@@ -34,22 +34,14 @@ class InputQuerySerializer(serializers.ModelSerializer):
         queryset=Story.objects.all()
     )
 
-    attributes = serializers.SlugRelatedField(
-        slug_field='id',
-        queryset=StoryAttribute.objects.all(),
-        required=False,
-        many=True
-    )
-
     class Meta:
         model = Query
-        fields = ('querystring', 'story', 'attributes',)
+        fields = ('querystring', 'story')
 
 
 class QuerySerializer(serializers.ModelSerializer):
-    attributes = StoryAttributeSerializer(many=True)
     parsed_ner = serializers.DictField()
 
     class Meta:
         model = Query
-        fields = ('querystring', 'attributes', 'configured', 'parsed_ner')
+        fields = ('id', 'querystring', 'configured', 'parsed_ner')
