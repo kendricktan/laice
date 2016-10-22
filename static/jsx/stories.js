@@ -60,5 +60,5 @@ var StoryTable = React.createClass({
 });
 
 ReactDOM.render(
-    <StoryTable/>, document.getElementById("div-stories-table")
+    <StoryTable/>, document.getElementById("div-attribute-table")
 );

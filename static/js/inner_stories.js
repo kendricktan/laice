@@ -20757,68 +20757,150 @@ module.exports = require('./lib/React');
 
 },{"./lib/React":54}],172:[function(require,module,exports){
 /**
- * Created by kendricktan on 21/10/16.
+ * Created by kendricktan on 22/10/16.
  */
-var React = require('react');
-var ReactDOM = require('react-dom');
+var React = require("react");
+var ReactDOM = require("react-dom");
 
-var StoryList = React.createClass({displayName: "StoryList",
-    render: function () {
-        return (
-            React.createElement("tbody", null, 
-            
-                this.props.data.stories.map(function (story) {
-                    return (
-                        React.createElement("tr", null, 
-                            React.createElement("th", {scope: "row"}, React.createElement("a", {href: story['name']}, story['name'])), 
-                            React.createElement("td", null, story['unconfigured_requests'])
-                        )
-                    );
-                })
-            
-            )
-        )
-    }
-});
-
-var StoryTable = React.createClass({displayName: "StoryTable",
+var AttributeApp = React.createClass({displayName: "AttributeApp",
     getInitialState: function () {
         return {
-            data: {
-                stories: []
-            }
+            attributeList: [],
+            labelText: ""
         };
     },
 
     componentDidMount: function () {
-        this.serverRequest = $.get(DOMAIN + 'api' + URL_PATH, function (stories) {
-            this.setState({data: {stories: stories}})
+        this.serverRequest = $.get("/api" + URL_PATH + "attributes/", function (attributes) {
+            this.setState({attributeList: attributes})
         }.bind(this));
     },
 
-    componentWillUnmount: function () {
-        this.serverRequest.abort();
+    handleAttributeSubmit: function (attr) {
+        this.setState({labelText: ""});
+        this.setState({attributeList: this.state.attributeList.concat([attr])});
+    },
+
+    handleAttributeRemove: function (attributeName) {
+        var newAttributeList = this.state.attributeList.filter(function (a) {
+            return a.attribute != attributeName;
+        });
+        this.setState({attributeList: newAttributeList});
+    },
+
+    handleAttributeDuplicate: function (){
+        this.setState({labelText: "Attribute name already exists!"});
     },
 
     render: function () {
         return (
-            React.createElement("table", {id: "stories-table", className: "table"}, 
-                React.createElement("thead", null, 
-                React.createElement("tr", null, 
-                    React.createElement("th", null, "Story"), 
-                    React.createElement("th", null, "Unconfigured requests")
-                )
+            React.createElement("div", null, 
+                React.createElement("table", {className: "table"}, 
+                    React.createElement("thead", null, 
+                    React.createElement("tr", null, 
+                        React.createElement("th", null, "Attribute"), 
+                        React.createElement("th", null, "Action")
+                    )
+                    ), 
+                    React.createElement(AttributeList, {attributeList: this.state.attributeList, 
+                                   onAttributeRemove: this.handleAttributeRemove})
                 ), 
-
-                React.createElement(StoryList, {data: this.state.data})
-
+                React.createElement("hr", null), 
+                React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
+                React.createElement(NewAttribute, {onAttributeDuplicate: this.handleAttributeDuplicate, onAttributeSubmit: this.handleAttributeSubmit})
             )
-        )
+        );
+    }
+});
+
+var AttributeList = React.createClass({displayName: "AttributeList",
+    handleAttributeRemove: function (attributeName) {
+        $.ajax({
+            url: "/api" + URL_PATH + "attributes/" + attributeName,
+            type: 'DELETE',
+            success: function (response) {
+                this.props.onAttributeRemove(attributeName);
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
+    render: function () {
+        var attributes = [];
+        this.props.attributeList.map(function (attribute) {
+            attributes.push(React.createElement(Attribute, {attributeName: attribute.attribute, 
+                                       onAttributeDelete: this.handleAttributeRemove}));
+        }.bind(this));
+        return (
+            React.createElement("tbody", null, 
+             attributes 
+            )
+        );
+    }
+});
+
+var Attribute = React.createClass({displayName: "Attribute",
+    handleAttributeRemove: function (attributeName) {
+        this.props.onAttributeDelete(this.props.attributeName);
+    },
+
+    render: function () {
+        return (
+            React.createElement("tr", null, 
+                React.createElement("td", null,  this.props.attributeName), 
+                React.createElement("td", null, 
+                    React.createElement("button", {type: "button", className: "btn btn-danger", 
+                            onClick: this.handleAttributeRemove}, 
+                        "Delete"
+                    )
+                )
+            )
+        );
+    }
+});
+
+var NewAttribute = React.createClass({displayName: "NewAttribute",
+    handleSubmit: function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "/api" + URL_PATH + "attributes/",
+            type: "POST",
+            data: {
+                attribute: this.state.attribute
+            },
+            success: function (response) {
+                console.log(response);
+                this.props.onAttributeSubmit(response);
+            }.bind(this),
+            error: function (response) {
+                this.props.onAttributeDuplicate();
+            }.bind(this)
+        });
+    },
+
+    getInitialState: function () {
+        return {
+            attribute: ""
+        };
+    },
+
+    render: function () {
+        return (
+            React.createElement("form", {onSubmit: this.handleSubmit}, 
+                React.createElement("input", {name: "name", type: "text", className: "form-control", 
+                       placeholder: "Story name (whitespaces will be trimed, special characters will be replaced with '-')", 
+                       onChange: (e)=>this.setState({attribute: e.target.value})}), React.createElement("br", null), 
+                React.createElement("button", {id: "add-story-btn", type: "submit", className: "btn btn-block btn-default btn-success"}, "Add")
+            )
+        );
     }
 });
 
 ReactDOM.render(
-    React.createElement(StoryTable, null), document.getElementById("div-attribute-table")
+    React.createElement(AttributeApp, null), document.getElementById("div-attribute-table")
 );
 
 },{"react":171,"react-dom":28}]},{},[172]);

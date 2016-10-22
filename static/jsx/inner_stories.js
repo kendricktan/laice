@@ -4,14 +4,65 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
+var AttributeApp = React.createClass({
+    getInitialState: function () {
+        return {
+            attributeList: [],
+            labelText: ""
+        };
+    },
+
+    componentDidMount: function () {
+        this.serverRequest = $.get("/api" + URL_PATH + "attributes/", function (attributes) {
+            this.setState({attributeList: attributes})
+        }.bind(this));
+    },
+
+    handleAttributeSubmit: function (attr) {
+        this.setState({labelText: ""});
+        this.setState({attributeList: this.state.attributeList.concat([attr])});
+    },
+
+    handleAttributeRemove: function (attributeName) {
+        var newAttributeList = this.state.attributeList.filter(function (a) {
+            return a.attribute != attributeName;
+        });
+        this.setState({attributeList: newAttributeList});
+    },
+
+    handleAttributeDuplicate: function (){
+        this.setState({labelText: "Attribute name already exists!"});
+    },
+
+    render: function () {
+        return (
+            <div>
+                <table className="table">
+                    <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <AttributeList attributeList={this.state.attributeList}
+                                   onAttributeRemove={this.handleAttributeRemove}/>
+                </table>
+                <hr/>
+                <p><span className="label label-warning">{this.state.labelText}</span></p>
+                <NewAttribute onAttributeDuplicate={this.handleAttributeDuplicate} onAttributeSubmit={this.handleAttributeSubmit}/>
+            </div>
+        );
+    }
+});
+
 var AttributeList = React.createClass({
-    deleteAttribute: function (attributeName) {
+    handleAttributeRemove: function (attributeName) {
         $.ajax({
             url: "/api" + URL_PATH + "attributes/" + attributeName,
             type: 'DELETE',
             success: function (response) {
-                $("#tr-" + attributeName).remove();
-            },
+                this.props.onAttributeRemove(attributeName);
+            }.bind(this),
             error: function (response) {
                 console.log(response);
             }
@@ -19,66 +70,41 @@ var AttributeList = React.createClass({
     },
 
     render: function () {
+        var attributes = [];
+        this.props.attributeList.map(function (attribute) {
+            attributes.push(<Attribute attributeName={attribute.attribute}
+                                       onAttributeDelete={this.handleAttributeRemove}/>);
+        }.bind(this));
         return (
             <tbody>
-                {
-                    this.props.data.attributes.map(function (attribute) {
-                        var tr_id = "tr-" + attribute["attribute"];
-                        return (
-                            <tr id={tr_id}>
-                                <th scope="row">{ attribute["attribute"] }</th>
-                                <th>
-                                    <button type="button" className="btn btn-danger"
-                                            onClick={
-                                                this.deleteAttribute.bind(this, attribute["attribute"])
-                                            }>
-                                        Delete
-                                    </button>
-                                </th>
-                            </tr>
-                        );
-                    }.bind(this))
-                }
+            { attributes }
             </tbody>
-        )
+        );
     }
 });
 
-var AttributeTable = React.createClass({
-    getInitialState: function () {
-        return {
-            data: {
-                attributes: []
-            }
-        };
-    },
-
-    componentDidMount: function () {
-        this.serverRequest = $.get("/api" + URL_PATH + "attributes/", function (attributes) {
-            this.setState({data: {attributes: attributes}})
-        }.bind(this));
+var Attribute = React.createClass({
+    handleAttributeRemove: function (attributeName) {
+        this.props.onAttributeDelete(this.props.attributeName);
     },
 
     render: function () {
         return (
-            <table id="attributes-table" className="table">
-                <thead>
-                <tr>
-                    <th>Attribute</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-
-                <AttributeList data={this.state.data}/>
-
-            </table>
-        )
+            <tr>
+                <td>{ this.props.attributeName }</td>
+                <td>
+                    <button type="button" className="btn btn-danger"
+                            onClick={this.handleAttributeRemove}>
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        );
     }
 });
 
-var AttributeAddForm = React.createClass({
-    onSubmit: function (e) {
-        // Prevent refresh
+var NewAttribute = React.createClass({
+    handleSubmit: function (e) {
         e.preventDefault();
 
         $.ajax({
@@ -88,11 +114,12 @@ var AttributeAddForm = React.createClass({
                 attribute: this.state.attribute
             },
             success: function (response) {
-                location.reload();
-            },
-            error: function (response) {
                 console.log(response);
-            }
+                this.props.onAttributeSubmit(response);
+            }.bind(this),
+            error: function (response) {
+                this.props.onAttributeDuplicate();
+            }.bind(this)
         });
     },
 
@@ -104,21 +131,16 @@ var AttributeAddForm = React.createClass({
 
     render: function () {
         return (
-            <form onSubmit={this.onSubmit}>
-                <input name="attribute" type="text" className="form-control"
-                       placeholder="Attribute name (only alpha numeric characters)"
+            <form onSubmit={this.handleSubmit}>
+                <input name="name" type="text" className="form-control"
+                       placeholder="Story name (whitespaces will be trimed, special characters will be replaced with '-')"
                        onChange={(e)=>this.setState({attribute: e.target.value})}/><br/>
-                <button id="add-attribute-btn" type="submit" className="btn btn-block btn-default btn-success">Add
-                </button>
+                <button id="add-story-btn" type="submit" className="btn btn-block btn-default btn-success">Add</button>
             </form>
-        )
+        );
     }
 });
 
 ReactDOM.render(
-    <AttributeTable/>, document.getElementById("div-attribute-table")
-);
-
-ReactDOM.render(
-    <AttributeAddForm/>, document.getElementById("div-add-attribute")
+    <AttributeApp/>, document.getElementById("div-attribute-table")
 );
