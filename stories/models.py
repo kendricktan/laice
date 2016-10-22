@@ -1,5 +1,5 @@
 from django.db import models
-from django.core import validators
+from annoying.fields import JSONField
 
 from rest_framework import exceptions
 
@@ -71,10 +71,14 @@ class Query(models.Model):
     story = models.ForeignKey(Story, null=False)
 
     # A query can have many attributes
-    attribute = models.ManyToManyField(StoryAttribute)
+    attributes = models.ManyToManyField(StoryAttribute)
 
     # Has the querystring been configured
     configured = models.BooleanField(default=False)
+
+    # If it's configured then we'll need to store its mapping fields
+    # Named entity recognizier via Spacy
+    parsed_ner = JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.querystring + ' | ' + str(self.story)

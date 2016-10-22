@@ -1,5 +1,6 @@
 from stories.models import (
     Story,
+    Query,
     StoryAttribute
 )
 from rest_framework import serializers
@@ -24,4 +25,31 @@ class InputStoryAttributeSerializer(serializers.ModelSerializer):
 class StoryAttributeSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoryAttribute
-        fields = ('attribute', )
+        fields = ('attribute',)
+
+
+class InputQuerySerializer(serializers.ModelSerializer):
+    story = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=Story.objects.all()
+    )
+
+    attributes = serializers.SlugRelatedField(
+        slug_field='id',
+        queryset=StoryAttribute.objects.all(),
+        required=False,
+        many=True
+    )
+
+    class Meta:
+        model = Query
+        fields = ('querystring', 'story', 'attributes',)
+
+
+class QuerySerializer(serializers.ModelSerializer):
+    attributes = StoryAttributeSerializer(many=True)
+    parsed_ner = serializers.DictField()
+
+    class Meta:
+        model = Query
+        fields = ('querystring', 'attributes', 'configured', 'parsed_ner')

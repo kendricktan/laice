@@ -21,7 +21,7 @@ def stories_view(request):
 
 def inner_story_view(request, story_name):
     inner_story = get_object_or_404(Story, name=story_name)
-    return render(request, 'inner_story.html', {'story_name': story_name})
+    return render(request, 'inner-story.html', {'story_name': story_name})
 
 
 # Rest framework ViewSets
@@ -75,3 +75,7 @@ class StoryAttributeViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewS
     def get_attributes(self):
         story = self.get_object()
         return story.storyattribute_set.all()
+
+# Story QuerySet serializer
+class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
+    queryset = Story.objects.all()

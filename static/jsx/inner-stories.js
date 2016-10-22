@@ -4,6 +4,58 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
+/* Inner story Header */
+var InnerStoryHeader = React.createClass({
+    onDeleteStory: function () {
+        $.ajax({
+            url: "/api" + URL_PATH,
+            type: 'DELETE',
+            success: function (response) {
+                window.location.replace(DOMAIN + STORY_URL);
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
+    render: function () {
+        return (
+            <h3>
+                <button type="button" className="pull-right btn btn-danger" data-toggle="modal"
+                        data-target="#delete-story-modal">
+                    Delete Story
+                </button>
+                <div className="modal fade" id="delete-story-modal" tabindex="-1" role="dialog"
+                     aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" id="myModalLabel">Delete story?</h4>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-primary" data-dismiss="modal">Close</button>
+                                <button type="button" className="btn btn-danger" onClick={this.onDeleteStory}>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href={STORY_URL}>Stories</a>
+                &nbsp; &gt; &nbsp;
+                <a href={STORY_URL + STORY_NAME}>{STORY_NAME}</a>
+            </h3>
+        )
+    }
+});
+
+ReactDOM.render(
+    <InnerStoryHeader/>, document.getElementById("div-story-header")
+);
+
+/* Attributes */
 var AttributeApp = React.createClass({
     getInitialState: function () {
         return {
@@ -30,7 +82,7 @@ var AttributeApp = React.createClass({
         this.setState({attributeList: newAttributeList});
     },
 
-    handleAttributeDuplicate: function (){
+    handleAttributeDuplicate: function () {
         this.setState({labelText: "Attribute name already exists!"});
     },
 
@@ -49,7 +101,8 @@ var AttributeApp = React.createClass({
                 </table>
                 <hr/>
                 <p><span className="label label-warning">{this.state.labelText}</span></p>
-                <NewAttribute onAttributeDuplicate={this.handleAttributeDuplicate} onAttributeSubmit={this.handleAttributeSubmit}/>
+                <NewAttribute onAttributeDuplicate={this.handleAttributeDuplicate}
+                              onAttributeSubmit={this.handleAttributeSubmit}/>
             </div>
         );
     }
@@ -143,4 +196,40 @@ var NewAttribute = React.createClass({
 
 ReactDOM.render(
     <AttributeApp/>, document.getElementById("div-attribute-table")
+);
+
+/* Manual query */
+var ManualQuery = React.createClass({
+    handleSubmit: function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "/api" + URL_PATH,
+            type: "POST",
+            data: {
+                attribute: this.state.attribute
+            },
+            success: function (response) {
+                this.props.onAttributeSubmit(response);
+                this.refs.attributeInput.value = "";
+            }.bind(this),
+            error: function (response) {
+                this.props.onAttributeDuplicate();
+            }.bind(this)
+        });
+    },
+
+    render: function () {
+        return (
+            <form onSubmit={this.handleSubmit()}>
+                <p><input type="text" placeholder="'Turn the temperature down by 2 degrees'" className="form-control"/>
+                </p>
+                <button type="submit" className="btn btn-block btn-default btn-primary">Query</button>
+            </form>
+        );
+    }
+});
+
+ReactDOM.render(
+    <ManualQuery/>, document.getElementById('div-manual-query')
 );

@@ -20762,6 +20762,58 @@ module.exports = require('./lib/React');
 var React = require("react");
 var ReactDOM = require("react-dom");
 
+/* Inner story Header */
+var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
+    onDeleteStory: function () {
+        $.ajax({
+            url: "/api" + URL_PATH,
+            type: 'DELETE',
+            success: function (response) {
+                window.location.replace(DOMAIN + STORY_URL);
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
+    render: function () {
+        return (
+            React.createElement("h3", null, 
+                React.createElement("button", {type: "button", className: "pull-right btn btn-danger", "data-toggle": "modal", 
+                        "data-target": "#delete-story-modal"}, 
+                    "Delete Story"
+                ), 
+                React.createElement("div", {className: "modal fade", id: "delete-story-modal", tabindex: "-1", role: "dialog", 
+                     "aria-labelledby": "myModalLabel"}, 
+                    React.createElement("div", {className: "modal-dialog", role: "document"}, 
+                        React.createElement("div", {className: "modal-content"}, 
+                            React.createElement("div", {className: "modal-header"}, 
+                                React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, React.createElement("span", {
+                                    "aria-hidden": "true"}, "×")), 
+                                React.createElement("h4", {className: "modal-title", id: "myModalLabel"}, "Delete story?")
+                            ), 
+                            React.createElement("div", {className: "modal-footer"}, 
+                                React.createElement("button", {type: "button", className: "btn btn-primary", "data-dismiss": "modal"}, "Close"), 
+                                React.createElement("button", {type: "button", className: "btn btn-danger", onClick: this.onDeleteStory}, "Delete"
+                                )
+                            )
+                        )
+                    )
+                ), 
+                React.createElement("a", {href: STORY_URL}, "Stories"), 
+                "  >  ", 
+                React.createElement("a", {href: STORY_URL + STORY_NAME}, STORY_NAME)
+            )
+        )
+    }
+});
+
+ReactDOM.render(
+    React.createElement(InnerStoryHeader, null), document.getElementById("div-story-header")
+);
+
+/* Attributes */
 var AttributeApp = React.createClass({displayName: "AttributeApp",
     getInitialState: function () {
         return {
@@ -20788,7 +20840,7 @@ var AttributeApp = React.createClass({displayName: "AttributeApp",
         this.setState({attributeList: newAttributeList});
     },
 
-    handleAttributeDuplicate: function (){
+    handleAttributeDuplicate: function () {
         this.setState({labelText: "Attribute name already exists!"});
     },
 
@@ -20807,7 +20859,8 @@ var AttributeApp = React.createClass({displayName: "AttributeApp",
                 ), 
                 React.createElement("hr", null), 
                 React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
-                React.createElement(NewAttribute, {onAttributeDuplicate: this.handleAttributeDuplicate, onAttributeSubmit: this.handleAttributeSubmit})
+                React.createElement(NewAttribute, {onAttributeDuplicate: this.handleAttributeDuplicate, 
+                              onAttributeSubmit: this.handleAttributeSubmit})
             )
         );
     }
@@ -20901,6 +20954,42 @@ var NewAttribute = React.createClass({displayName: "NewAttribute",
 
 ReactDOM.render(
     React.createElement(AttributeApp, null), document.getElementById("div-attribute-table")
+);
+
+/* Manual query */
+var ManualQuery = React.createClass({displayName: "ManualQuery",
+    handleSubmit: function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "/api" + URL_PATH,
+            type: "POST",
+            data: {
+                attribute: this.state.attribute
+            },
+            success: function (response) {
+                this.props.onAttributeSubmit(response);
+                this.refs.attributeInput.value = "";
+            }.bind(this),
+            error: function (response) {
+                this.props.onAttributeDuplicate();
+            }.bind(this)
+        });
+    },
+
+    render: function () {
+        return (
+            React.createElement("form", {onSubmit: this.handleSubmit()}, 
+                React.createElement("p", null, React.createElement("input", {type: "text", placeholder: "'Turn the temperature down by 2 degrees'", className: "form-control"})
+                ), 
+                React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Query")
+            )
+        );
+    }
+});
+
+ReactDOM.render(
+    React.createElement(ManualQuery, null), document.getElementById('div-manual-query')
 );
 
 },{"react":171,"react-dom":28}]},{},[172]);

@@ -6,21 +6,26 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Heading -->
     <div class="well">
-        <h3>
-            <button id="delete-story-btn" type="button" class="pull-right btn btn-danger">Delete Story</button>
-            <a href="{% url 'stories_view' %}">Stories</a>
-            &nbsp; > &nbsp;
-            <a href="{% url 'inner_story_view' story_name=story_name %}"> {{ story_name }} </a>
-        </h3>
+        <div id="div-story-header"></div>
+    </div><br/>
+
+    <!-- Attributes -->
+    <div class="well"><h2>Attributes</h2>
+        <hr/>
+        <div id="div-attribute-table"></div>
     </div>
 
     <br/>
+    <hr/>
+    <br/>
 
+    <!-- Query -->
     <div class="well">
-        <h2>Attributes</h2>
+        <h2>Manual query</h2>
         <hr/>
-        <div id="div-attribute-table"></div>
+        <div id="div-manual-query"></div>
     </div>
 
     <br/>
@@ -128,5 +133,9 @@
 
 {% load static %}
 {% block end_extra_scripts %}
-    <script src="{% static 'js/inner_stories.js' %}"></script>
+    <script>
+        var STORY_URL = "{% url 'stories_view' %}";
+        var STORY_NAME = "{{ story_name }}";
+    </script>
+    <script src="{% static 'js/inner-stories.js' %}"></script>
 {% endblock %}

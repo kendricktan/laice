@@ -13,7 +13,7 @@ var StoryApp = React.createClass({
     },
 
     componentDidMount: function () {
-        this.serverRequest = $.get(DOMAIN + 'api' + URL_PATH, function (stories) {
+        this.serverRequest = $.get('/api' + URL_PATH, function (stories) {
             this.setState({stories: stories});
         }.bind(this));
     },
