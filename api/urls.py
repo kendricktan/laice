@@ -3,11 +3,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from stories.views import (
-    story_detail,
-    story_list
+    StoryViewSet,
+    StoryAttributeViewSet,
 )
 
 urlpatterns = [
-    url(r'^stories/?$', story_list, name='story_list'),
-    url(r'^stories/(?P<story_name>[a-zA-Z0-9]+)/?$', story_detail, name='story_detail'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    url(r'^stories/$', StoryViewSet.list_mapping(), name='story_list'),
+    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/$', StoryViewSet.detail_mapping(), name='story_detail'),
+
+    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/attributes/$', StoryAttributeViewSet.list_mapping(),
+        name='story_attribute_list'),
+    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/attributes/(?P<attribute_name>[A-Za-z0-9]+)/$', StoryAttributeViewSet.detail_mapping(),
+        name='story_attribute_detail'),
+]

@@ -9,5 +9,5 @@ from stories.views import (
 
 urlpatterns = [
     url(r'^$', stories_view, name='stories_view'),
-    url(r'^(?P<story_name>[a-zA-Z0-9]+)/?$', inner_story_view, name='inner_story_view'),
+    url(r'^(?P<story_name>[A-Za-z0-9_-]+)/$', inner_story_view, name='inner_story_view'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

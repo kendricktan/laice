@@ -27,9 +27,9 @@
 
         <div id="div-stories-table"></div>
 
-        <form id="new-story-form" action="/api/stories/" method="post">
+        <form id="new-story-form" action="/api{{ request.path }}" method="post">
             <input name="name" type="text" class="form-control"
-                   placeholder="Story name (whitespaces will be trimed)"><br/>
+                   placeholder="Story name (whitespaces will be trimed, special characters will be replaced with '-')"><br/>
             <button id="add-story-btn" type="submit" class="btn btn-block btn-default btn-success">Add</button>
         </form>
 
@@ -38,6 +38,7 @@
 {% endblock content %}
 
 {% block end_extra_scripts %}
+    <script src="{% static 'js/stories.js' %}"></script>
     <script>
         $(function () {
             $('#add-story-btn').on('click', function (e) {

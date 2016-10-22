@@ -8,11 +8,10 @@
 {% block content %}
     <div class="well">
         <h3>
+            <button id="delete-story-btn" type="button" class="pull-right btn btn-danger">Delete Story</button>
             <a href="{% url 'stories_view' %}">Stories</a>
             &nbsp; > &nbsp;
             <a href="{% url 'inner_story_view' story_name=story_name %}"> {{ story_name }} </a>
-
-            <button type="button" class="pull-right btn btn-danger">Delete Story</button>
         </h3>
     </div>
 
@@ -23,35 +22,13 @@
         <h2>Attributes</h2>
         <hr/>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Attribute</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <th scope="row"><a href="#">action</a></th>
-                <th>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </th>
-            </tr>
-            <tr>
-                <th scope="row"><a href="#">object</a></th>
-                <th>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </th>
-            </tr>
-            <tr>
-                <th scope="row"><input type="text" class="form-control" placeholder="Attribute"></th>
-                <th>
-                    <button type="submit" class="btn btn-block btn-success">Add</button>
-                </th>
-            </tr>
-            </tbody>
-        </table>
+        <div id="attributes-add-status-label">
+        </div>
+
+        <div id="div-attribute-table"></div>
         <hr/>
+
+        <div id="div-add-attribute"></div>
 
     </div>
 
@@ -139,6 +116,7 @@
                     <button type="button" class="btn btn-danger">Delete</button>
                 </th>
             </tr>
+            <tbody>
             <tr>
                 <th><input type="text" class="form-control" placeholder="text"></th>
                 <th>
@@ -156,3 +134,46 @@
     </div>
 
 {% endblock content %}
+
+{% load static %}
+{% block end_extra_scripts %}
+    <script src="{% static 'js/inner_stories.js' %}"></script>
+    <script>
+        $(function () {
+            $('#addaa-attribute-btn').on('click', function (e) {
+                e.preventDefault(); // prevent the default form submit action
+
+                var l = document.getElementById("attributes-add-status-label");
+                var $form = $('#new-attribute-form');
+
+                $.ajax({
+                    url: $form.attr("action"),
+                    type: $form.attr("method"),
+                    data: $form.serialize(),
+                    success: function (response) {
+                        l.innerHTML = "";
+
+                        // Get table
+                        var table = document.getElementById("attributes-table");
+
+                        // Create empty row
+                        var row = table.insertRow(-1);
+
+                        // Cells to be entered to row
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+
+                        // Set inner HTML
+                        cell1.innerHTML = "<th scope='row'><strong>" + response['attribute'] + "</strong></th>";
+                        cell2.innerHTML = '<th><button type="button" class="btn btn-danger">Delete</button></th>';
+                    },
+                    error: function (response) {
+                        l.innerHTML = '<div class="alert alert-warning" role="alert"><a href="#" class="alert-link">Sorry, attribute name has been taken!</a></div>';
+                    },
+                });
+
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

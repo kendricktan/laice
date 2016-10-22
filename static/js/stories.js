@@ -20779,7 +20779,7 @@ var StoryList = React.createClass({displayName: "StoryList",
             )
         )
     }
-})
+});
 
 var StoryTable = React.createClass({displayName: "StoryTable",
     getInitialState: function () {
@@ -20791,7 +20791,7 @@ var StoryTable = React.createClass({displayName: "StoryTable",
     },
 
     componentDidMount: function () {
-        this.serverRequest = $.get(DOMAIN + 'api/stories/', function (stories) {
+        this.serverRequest = $.get(DOMAIN + 'api' + URL_PATH, function (stories) {
             this.setState({data: {stories: stories}})
         }.bind(this));
     },

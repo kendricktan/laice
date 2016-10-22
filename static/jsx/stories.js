@@ -21,7 +21,7 @@ var StoryList = React.createClass({
             </tbody>
         )
     }
-})
+});
 
 var StoryTable = React.createClass({
     getInitialState: function () {
@@ -33,7 +33,7 @@ var StoryTable = React.createClass({
     },
 
     componentDidMount: function () {
-        this.serverRequest = $.get(DOMAIN + 'api/stories/', function (stories) {
+        this.serverRequest = $.get(DOMAIN + 'api' + URL_PATH, function (stories) {
             this.setState({data: {stories: stories}})
         }.bind(this));
     },
