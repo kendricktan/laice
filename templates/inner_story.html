@@ -129,42 +129,4 @@
 {% load static %}
 {% block end_extra_scripts %}
     <script src="{% static 'js/inner_stories.js' %}"></script>
-    <script>
-        $(function () {
-            $('#addaa-attribute-btn').on('click', function (e) {
-                e.preventDefault(); // prevent the default form submit action
-
-                var l = document.getElementById("attributes-add-status-label");
-                var $form = $('#new-attribute-form');
-
-                $.ajax({
-                    url: $form.attr("action"),
-                    type: $form.attr("method"),
-                    data: $form.serialize(),
-                    success: function (response) {
-                        l.innerHTML = "";
-
-                        // Get table
-                        var table = document.getElementById("attributes-table");
-
-                        // Create empty row
-                        var row = table.insertRow(-1);
-
-                        // Cells to be entered to row
-                        var cell1 = row.insertCell(0);
-                        var cell2 = row.insertCell(1);
-
-                        // Set inner HTML
-                        cell1.innerHTML = "<th scope='row'><strong>" + response['attribute'] + "</strong></th>";
-                        cell2.innerHTML = '<th><button type="button" class="btn btn-danger">Delete</button></th>';
-                    },
-                    error: function (response) {
-                        l.innerHTML = '<div class="alert alert-warning" role="alert"><a href="#" class="alert-link">Sorry, attribute name has been taken!</a></div>';
-                    },
-                });
-
-                return false;
-            });
-        });
-    </script>
 {% endblock %}

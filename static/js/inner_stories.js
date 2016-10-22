@@ -20872,8 +20872,8 @@ var NewAttribute = React.createClass({displayName: "NewAttribute",
                 attribute: this.state.attribute
             },
             success: function (response) {
-                console.log(response);
                 this.props.onAttributeSubmit(response);
+                this.refs.attributeInput.value = "";
             }.bind(this),
             error: function (response) {
                 this.props.onAttributeDuplicate();
@@ -20890,7 +20890,7 @@ var NewAttribute = React.createClass({displayName: "NewAttribute",
     render: function () {
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
-                React.createElement("input", {name: "name", type: "text", className: "form-control", 
+                React.createElement("input", {ref: "attributeInput", name: "attribute", type: "text", className: "form-control", 
                        placeholder: "Story name (whitespaces will be trimed, special characters will be replaced with '-')", 
                        onChange: (e)=>this.setState({attribute: e.target.value})}), React.createElement("br", null), 
                 React.createElement("button", {id: "add-story-btn", type: "submit", className: "btn btn-block btn-default btn-success"}, "Add")

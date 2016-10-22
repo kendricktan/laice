@@ -20762,37 +20762,17 @@ module.exports = require('./lib/React');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var StoryList = React.createClass({displayName: "StoryList",
-    render: function () {
-        return (
-            React.createElement("tbody", null, 
-            
-                this.props.data.stories.map(function (story) {
-                    return (
-                        React.createElement("tr", null, 
-                            React.createElement("th", {scope: "row"}, React.createElement("a", {href: story['name']}, story['name'])), 
-                            React.createElement("td", null, story['unconfigured_requests'])
-                        )
-                    );
-                })
-            
-            )
-        )
-    }
-});
-
-var StoryTable = React.createClass({displayName: "StoryTable",
+var StoryApp = React.createClass({displayName: "StoryApp",
     getInitialState: function () {
         return {
-            data: {
-                stories: []
-            }
+            stories: [],
+            labelText: ""
         };
     },
 
     componentDidMount: function () {
         this.serverRequest = $.get(DOMAIN + 'api' + URL_PATH, function (stories) {
-            this.setState({data: {stories: stories}})
+            this.setState({stories: stories});
         }.bind(this));
     },
 
@@ -20800,25 +20780,101 @@ var StoryTable = React.createClass({displayName: "StoryTable",
         this.serverRequest.abort();
     },
 
+    handleStoryAdd: function (story) {
+        this.setState({labelText: ""});
+        this.setState({stories: this.state.stories.concat([story])});
+    },
+
+    handleStoryDuplicate: function(){
+        this.setState({labelText: "Story name already exists!"});
+    },
+
     render: function () {
         return (
-            React.createElement("table", {id: "stories-table", className: "table"}, 
-                React.createElement("thead", null, 
-                React.createElement("tr", null, 
-                    React.createElement("th", null, "Story"), 
-                    React.createElement("th", null, "Unconfigured requests")
-                )
+            React.createElement("div", null, 
+                React.createElement("table", {id: "stories-table", className: "table"}, 
+                    React.createElement("thead", null, 
+                    React.createElement("tr", null, 
+                        React.createElement("th", null, "Story"), 
+                        React.createElement("th", null, "Unconfigured requests")
+                    )
+                    ), 
+
+                    React.createElement(StoryList, {stories: this.state.stories})
                 ), 
-
-                React.createElement(StoryList, {data: this.state.data})
-
+                React.createElement("hr", null), 
+                React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
+                React.createElement(AddStory, {onDuplicateStory: this.handleStoryDuplicate, onAddStory: this.handleStoryAdd})
             )
         )
     }
 });
 
+var StoryList = React.createClass({displayName: "StoryList",
+    render: function () {
+        var stories = [];
+        this.props.stories.map(function(story){
+            stories.push(React.createElement(Story, {storyName: story.name, storyUnconfiguredCount: story.unconfigured_requests}))
+        }.bind(this));
+        return (
+            React.createElement("tbody", null, 
+             stories 
+            )
+        )
+    }
+});
+
+var Story = React.createClass({displayName: "Story",
+   render: function(){
+       return(
+           React.createElement("tr", null, 
+               React.createElement("td", null, React.createElement("a", {href:  this.props.storyName},  this.props.storyName)), 
+               React.createElement("td", null,  this.props.storyUnconfiguredCount)
+           )
+       );
+   }
+});
+
+var AddStory = React.createClass({displayName: "AddStory",
+    handleSubmit: function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: "/api" + URL_PATH,
+            type: "POST",
+            data: {
+                name: this.state.name
+            },
+            success: function (response) {
+                this.props.onAddStory(response);
+                this.refs.nameInput.value = "";
+            }.bind(this),
+            error: function (response) {
+                this.props.onDuplicateStory();
+            }.bind(this),
+        });
+    },
+
+    getInitialState: function () {
+        return {
+            name: ""
+        };
+    },
+
+    render: function () {
+        return (
+            React.createElement("form", {onSubmit: this.handleSubmit}, 
+                React.createElement("input", {ref: "nameInput", name: "name", type: "text", className: "form-control", 
+                       placeholder: "Story name (whitespaces will be trimed, special characters will be replaced with '-')", 
+                       onChange: (e)=>this.setState({name: e.target.value})}), React.createElement("br", null), 
+                React.createElement("button", {id: "add-story-btn", type: "submit", className: "btn btn-block btn-default btn-success"}, "Add")
+            )
+        );
+    }
+});
+
 ReactDOM.render(
-    React.createElement(StoryTable, null), document.getElementById("div-attribute-table")
+    React.createElement(StoryApp, null), document.getElementById("div-stories-table")
 );
 
 },{"react":171,"react-dom":28}]},{},[172]);

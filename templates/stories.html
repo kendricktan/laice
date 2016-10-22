@@ -22,16 +22,7 @@
         <h2>Story List</h2>
         <hr/>
 
-        <div id="story-add-status-label">
-        </div>
-
         <div id="div-stories-table"></div>
-
-        <form id="new-story-form" action="/api{{ request.path }}" method="post">
-            <input name="name" type="text" class="form-control"
-                   placeholder="Story name (whitespaces will be trimed, special characters will be replaced with '-')"><br/>
-            <button id="add-story-btn" type="submit" class="btn btn-block btn-default btn-success">Add</button>
-        </form>
 
     </div>
 
@@ -39,40 +30,4 @@
 
 {% block end_extra_scripts %}
     <script src="{% static 'js/stories.js' %}"></script>
-    <script>
-        $(function () {
-            $('#add-story-btn').on('click', function (e) {
-                e.preventDefault(); // prevent the default form submit action
-
-                var l = document.getElementById("story-add-status-label");
-                var $form = $('#new-story-form');
-
-                $.ajax({
-                    url: $form.attr("action"),
-                    type: $form.attr("method"),
-                    data: $form.serialize(),
-                    success: function (response) {
-                        l.innerHTML = "";
-
-                        // Get table
-                        var table = document.getElementById("stories-table");
-
-                        // Create empty row
-                        var row = table.insertRow(-1);
-
-                        // Cells to be entered to row
-                        var story_name = row.insertCell(0);
-                        var story_unconfigured_req = row.insertCell(1);
-
-                        // Set inner HTML
-                        story_name.innerHTML = "<th scope='row'><a href=" + response["name"] + "><strong>" + response["name"] + "</strong></a></th>";
-                        story_unconfigured_req.innerHTML = "<th>0</th>"
-                    },
-                    error: function (response) {
-                        l.innerHTML = '<div class="alert alert-warning" role="alert"><a href="#" class="alert-link">Sorry, story name has been taken!</a></div>';
-                    },
-                });
-            });
-        });
-    </script>
 {% endblock %}
