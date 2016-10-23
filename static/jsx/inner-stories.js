@@ -4,6 +4,85 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
+/* Inner story main app */
+var InnerStoryApp = React.createClass({
+    getInitialState: function(){
+        return {
+            attributeList: [],
+        }
+    },
+
+    componentDidMount: function () {
+        this.serverRequest = $.get("/api" + URL_PATH + "attributes/", function (attributes) {
+            this.setState({attributeList: attributes})
+        }.bind(this));
+    },
+
+    handleAttributeSubmit: function(attr){
+        this.setState({attributeList: this.state.attributeList.concat([attr])});
+    },
+
+    handleAttributeDelete: function(attributeName){
+        var newAttributeList = this.state.attributeList.filter(function (a) {
+            return a.attribute != attributeName;
+        });
+        this.setState({attributeList: newAttributeList});
+    },
+
+    render: function () {
+        return (
+            <div>
+                <div className="well">
+                    <InnerStoryHeader/>
+                </div>
+
+                <br/>
+
+                <div className="well">
+                    <h2>Attributes</h2>
+                    <AttributeApp
+                        attributeList={this.state.attributeList}
+                        onAttributeSubmit={this.handleAttributeSubmit}
+                        onAttributeDelete={this.handleAttributeDelete}
+                    />
+                </div>
+
+                <br/>
+                <hr/>
+                <br/>
+
+                <div className="well">
+                    <h2>Manual query</h2>
+                    <ManualQuery/>
+                </div>
+
+                <br/>
+                <hr/>
+                <br/>
+
+                <div className="pull-right btn-group">
+                    <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                        View: unconfigured <span className="caret"></span>
+                    </button>
+                    <ul className="dropdown-menu">
+                        <li><a href="#">View: unconfigured</a></li>
+                        <li><a href="#">View: configured</a></li>
+                        <li><a href="#">View: all</a></li>
+                    </ul>
+                </div>
+
+                <br/>
+                <br/>
+                <br/>
+
+                <QueryApp attributeList={this.state.attributeList}/>
+            </div>
+        )
+    }
+});
+
 /* Inner story Header */
 var InnerStoryHeader = React.createClass({
     onDeleteStory: function () {
@@ -51,35 +130,21 @@ var InnerStoryHeader = React.createClass({
     }
 });
 
-ReactDOM.render(
-    <InnerStoryHeader/>, document.getElementById("div-story-header")
-);
-
 /* Attributes */
 var AttributeApp = React.createClass({
     getInitialState: function () {
         return {
-            attributeList: [],
             labelText: ""
         };
     },
 
-    componentDidMount: function () {
-        this.serverRequest = $.get("/api" + URL_PATH + "attributes/", function (attributes) {
-            this.setState({attributeList: attributes})
-        }.bind(this));
-    },
-
     handleAttributeSubmit: function (attr) {
         this.setState({labelText: ""});
-        this.setState({attributeList: this.state.attributeList.concat([attr])});
+        this.props.onAttributeSubmit(attr);
     },
 
     handleAttributeRemove: function (attributeName) {
-        var newAttributeList = this.state.attributeList.filter(function (a) {
-            return a.attribute != attributeName;
-        });
-        this.setState({attributeList: newAttributeList});
+        this.props.onAttributeDelete(attributeName);
     },
 
     handleAttributeDuplicate: function () {
@@ -96,7 +161,7 @@ var AttributeApp = React.createClass({
                         <th>Action</th>
                     </tr>
                     </thead>
-                    <AttributeList attributeList={this.state.attributeList}
+                    <AttributeList attributeList={this.props.attributeList}
                                    onAttributeRemove={this.handleAttributeRemove}/>
                 </table>
                 <hr/>
@@ -194,10 +259,6 @@ var NewAttribute = React.createClass({
     }
 });
 
-ReactDOM.render(
-    <AttributeApp/>, document.getElementById("div-attribute-table")
-);
-
 /* Manual query */
 var ManualQuery = React.createClass({
     handleSubmit: function (e) {
@@ -232,10 +293,6 @@ var ManualQuery = React.createClass({
         );
     }
 });
-
-ReactDOM.render(
-    <ManualQuery/>, document.getElementById('div-manual-query')
-);
 
 /* View queries */
 var QueryApp = React.createClass({
@@ -282,6 +339,7 @@ var QueryApp = React.createClass({
                 <QueryList
                     handleQueryListRemove={this.handleQueryListRemove}
                     queryList={this.state.queryList}
+                    attributeList={this.props.attributeList}
                 />
             </div>
         );
@@ -289,20 +347,6 @@ var QueryApp = React.createClass({
 });
 
 var QueryList = React.createClass({
-    getInitialState: function () {
-        return {
-            attributeList: [],
-        };
-    },
-
-    componentDidMount: function () {
-        $.get("/api" + URL_PATH + "attributes/", function (response) {
-            this.setState({
-                attributeList: response
-            })
-        }.bind(this));
-    },
-
     onQueryListDelete: function (queryId) {
         this.props.handleQueryListRemove(queryId);
     },
@@ -332,7 +376,7 @@ var QueryList = React.createClass({
                         </thead>
 
 
-                        <QueryNERList attributeList={this.state.attributeList} nerDict={nerDict} queryId={query.id}/>
+                        <QueryNERList attributeList={this.props.attributeList} nerDict={nerDict} queryId={query.id}/>
 
                     </table>
                 </div>
@@ -379,7 +423,7 @@ var QueryNERList = React.createClass({
         });
     },
 
-    onNERCreate: function(targetText, targetAttribute){
+    onNERCreate: function (targetText, targetAttribute) {
         var ner = {};
         ner[targetText] = targetAttribute;
 
@@ -391,12 +435,12 @@ var QueryNERList = React.createClass({
             data: JSON.stringify({
                 ner
             }),
-            success: function(response){
+            success: function (response) {
                 var newNerDict = this.state.nerDict;
                 newNerDict[targetText] = targetAttribute;
                 this.setState({newDict: newNerDict});
             }.bind(this),
-            error: function(response){
+            error: function (response) {
                 console.log(response);
             }
         })
@@ -455,7 +499,7 @@ var QueryNewNER = React.createClass({
         }
     },
 
-    onNERSelectAttribute: function(val){
+    onNERSelectAttribute: function (val) {
         this.setState({targetAttribute: val});
     },
 
@@ -487,7 +531,7 @@ var QueryNewNER = React.createClass({
 
 // Select combo-box for queries
 var QueryAttributeSelect = React.createClass({
-    onSelectChange: function(val){
+    onSelectChange: function (val) {
         this.props.handleNERSelectAttribute(val);
     },
 
@@ -506,6 +550,5 @@ var QueryAttributeSelect = React.createClass({
 });
 
 ReactDOM.render(
-    <QueryApp/>
-    , document.getElementById("div-query-list")
+    <InnerStoryApp/>, document.getElementById('div-inner-story-content')
 );
