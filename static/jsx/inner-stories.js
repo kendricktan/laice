@@ -26,7 +26,7 @@ var InnerStoryHeader = React.createClass({
                         data-target="#delete-story-modal">
                     Delete Story
                 </button>
-                <div className="modal fade" id="delete-story-modal" tabindex="-1" role="dialog"
+                <div className="modal fade" id="delete-story-modal" tabIndex="-1" role="dialog"
                      aria-labelledby="myModalLabel">
                     <div className="modal-dialog" role="document">
                         <div className="modal-content">
@@ -204,14 +204,13 @@ var ManualQuery = React.createClass({
         e.preventDefault();
 
         $.ajax({
-            url: "/api" + URL_PATH,
+            url: "/api" + URL_PATH + "queries/",
             type: "POST",
             data: {
-                attribute: this.state.attribute
+                querystring: this.state.querystring
             },
             success: function (response) {
-                this.props.onAttributeSubmit(response);
-                this.refs.attributeInput.value = "";
+                this.refs.querystringInput.value = "";
             }.bind(this),
             error: function (response) {
                 this.props.onAttributeDuplicate();
@@ -222,7 +221,10 @@ var ManualQuery = React.createClass({
     render: function () {
         return (
             <form onSubmit={this.handleSubmit}>
-                <p><input type="text" placeholder="'Turn the temperature down by 2 degrees'" className="form-control"/>
+                <p>
+                    <input ref="querystringInput" type="text" placeholder="'Turn the temperature down by 2 degrees'"
+                           className="form-control"
+                           onChange={(e)=>this.setState({querystring: e.target.value})}/>
                 </p>
                 <button type="submit" className="btn btn-block btn-default btn-primary">Query</button>
             </form>
@@ -232,4 +234,157 @@ var ManualQuery = React.createClass({
 
 ReactDOM.render(
     <ManualQuery/>, document.getElementById('div-manual-query')
+);
+
+/* View queries */
+var QueryApp = React.createClass({
+    getInitialState: function () {
+        return {
+            queryList: [
+                // querystring
+                // configured
+                // parsed_ner <- NER = named entity recognizer
+            ],
+            nextURL: "",
+        }
+    },
+
+    componentDidMount: function () {
+        this.serverRequest = $.get("/api" + URL_PATH + "queries/", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next
+            })
+        }.bind(this));
+    },
+
+    render: function () {
+        return (
+            <div>
+                <QueryList queryList={this.state.queryList}/>
+            </div>
+        );
+    }
+});
+
+var QueryList = React.createClass({
+    getInitialState: function () {
+        return {
+            attributeList: [],
+        };
+    },
+
+    componentDidMount: function () {
+        $.get("/api" + URL_PATH + "attributes/", function (response) {
+            this.setState({
+                attributeList: response
+            })
+        }.bind(this));
+    },
+
+    render: function () {
+        var queries = [];
+        this.props.queryList.map(function (query) {
+            var gylClass = query.configured ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove";
+            var nerDict = query.parsed_ner ? query.parsed_ner : {};
+            queries.push(
+                <div className="well">
+                    <h4><span className={gylClass}></span>&nbsp; {query.querystring}</h4>
+                    <hr/>
+
+                    <table className="table">
+                        <thead>
+                        <tr>
+                            <th>Text</th>
+                            <th>Attribute</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+
+                        <QueryNERList attributeList={this.state.attributeList} nerDict={nerDict}/>
+
+                    </table>
+                </div>
+            );
+        }.bind(this));
+        return (
+            <div>
+                {queries}
+            </div>
+        )
+    }
+});
+
+// Query NER List
+var QueryNERList = React.createClass({
+    render: function () {
+        var ners = [];
+        for (var key in this.props.nerDict) {
+            if (this.props.nerDict.hasOwnProperty(key)) {
+                var targetText = this.props.nerDict[key];
+                ners.push(
+                    <QueryNER targetText={targetText} targetKey={key}/>
+                )
+            }
+        }
+        return (
+            <tbody>
+            {ners}
+            <QueryNewNER attributeList={this.props.attributeList}/>
+            </tbody>
+        )
+    }
+});
+
+// Query Name Entity Recognizer
+var QueryNER = React.createClass({
+    render: function () {
+        return (
+            <tr>
+                <td scope="row">{ this.props.targetText }</td>
+                <td>{ this.props.targetKey }</td>
+                <td>
+                    <button type="button" className="btn btn-danger">Delete</button>
+                </td>
+            </tr>
+        )
+    }
+});
+
+// New NER
+var QueryNewNER = React.createClass({
+    render: function () {
+        return (
+            <tr>
+                <th><input type="text" className="form-control" placeholder="text"/></th>
+                <th>
+                    <QueryAttributeSelect attributeList={this.props.attributeList}/>
+                </th>
+                <th>
+                    <button type="button" className="btn btn-success">Add</button>
+                </th>
+            </tr>
+        )
+    }
+});
+
+// Select combo-box for queries
+var QueryAttributeSelect = React.createClass({
+    render: function () {
+        return (
+            <select className="form-control">
+                {
+                    this.props.attributeList.map(function (attribute) {
+                        return (<option value={attribute.attribute}>{attribute.attribute}</option>)
+                    }.bind(this))
+                }
+            </select>
+        )
+    }
+});
+
+ReactDOM.render(
+    <QueryApp/>
+    , document.getElementById("div-query-list")
 );

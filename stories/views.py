@@ -131,5 +131,5 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         return querystring
 
     def get_querystrings(self):
-        querystrings = self.get_object().query_set.all()
+        querystrings = self.get_object().query_set.all().order_by('-pk')
         return querystrings

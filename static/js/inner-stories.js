@@ -20784,7 +20784,7 @@ var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
                         "data-target": "#delete-story-modal"}, 
                     "Delete Story"
                 ), 
-                React.createElement("div", {className: "modal fade", id: "delete-story-modal", tabindex: "-1", role: "dialog", 
+                React.createElement("div", {className: "modal fade", id: "delete-story-modal", tabIndex: "-1", role: "dialog", 
                      "aria-labelledby": "myModalLabel"}, 
                     React.createElement("div", {className: "modal-dialog", role: "document"}, 
                         React.createElement("div", {className: "modal-content"}, 
@@ -20962,14 +20962,13 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
         e.preventDefault();
 
         $.ajax({
-            url: "/api" + URL_PATH,
+            url: "/api" + URL_PATH + "queries/",
             type: "POST",
             data: {
-                attribute: this.state.attribute
+                querystring: this.state.querystring
             },
             success: function (response) {
-                this.props.onAttributeSubmit(response);
-                this.refs.attributeInput.value = "";
+                this.refs.querystringInput.value = "";
             }.bind(this),
             error: function (response) {
                 this.props.onAttributeDuplicate();
@@ -20980,7 +20979,10 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
     render: function () {
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
-                React.createElement("p", null, React.createElement("input", {type: "text", placeholder: "'Turn the temperature down by 2 degrees'", className: "form-control"})
+                React.createElement("p", null, 
+                    React.createElement("input", {ref: "querystringInput", type: "text", placeholder: "'Turn the temperature down by 2 degrees'", 
+                           className: "form-control", 
+                           onChange: (e)=>this.setState({querystring: e.target.value})})
                 ), 
                 React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Query")
             )
@@ -20990,6 +20992,159 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
 
 ReactDOM.render(
     React.createElement(ManualQuery, null), document.getElementById('div-manual-query')
+);
+
+/* View queries */
+var QueryApp = React.createClass({displayName: "QueryApp",
+    getInitialState: function () {
+        return {
+            queryList: [
+                // querystring
+                // configured
+                // parsed_ner <- NER = named entity recognizer
+            ],
+            nextURL: "",
+        }
+    },
+
+    componentDidMount: function () {
+        this.serverRequest = $.get("/api" + URL_PATH + "queries/", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next
+            })
+        }.bind(this));
+    },
+
+    render: function () {
+        return (
+            React.createElement("div", null, 
+                React.createElement(QueryList, {queryList: this.state.queryList})
+            )
+        );
+    }
+});
+
+var QueryList = React.createClass({displayName: "QueryList",
+    getInitialState: function () {
+        return {
+            attributeList: [],
+        };
+    },
+
+    componentDidMount: function () {
+        $.get("/api" + URL_PATH + "attributes/", function (response) {
+            this.setState({
+                attributeList: response
+            })
+        }.bind(this));
+    },
+
+    render: function () {
+        var queries = [];
+        this.props.queryList.map(function (query) {
+            var gylClass = query.configured ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove";
+            var nerDict = query.parsed_ner ? query.parsed_ner : {};
+            queries.push(
+                React.createElement("div", {className: "well"}, 
+                    React.createElement("h4", null, React.createElement("span", {className: gylClass}), "  ", query.querystring), 
+                    React.createElement("hr", null), 
+
+                    React.createElement("table", {className: "table"}, 
+                        React.createElement("thead", null, 
+                        React.createElement("tr", null, 
+                            React.createElement("th", null, "Text"), 
+                            React.createElement("th", null, "Attribute"), 
+                            React.createElement("th", null, "Action")
+                        )
+                        ), 
+
+
+                        React.createElement(QueryNERList, {attributeList: this.state.attributeList, nerDict: nerDict})
+
+                    )
+                )
+            );
+        }.bind(this));
+        return (
+            React.createElement("div", null, 
+                queries
+            )
+        )
+    }
+});
+
+// Query NER List
+var QueryNERList = React.createClass({displayName: "QueryNERList",
+    render: function () {
+        var ners = [];
+        for (var key in this.props.nerDict) {
+            if (this.props.nerDict.hasOwnProperty(key)) {
+                var targetText = this.props.nerDict[key];
+                ners.push(
+                    React.createElement(QueryNER, {targetText: targetText, targetKey: key})
+                )
+            }
+        }
+        return (
+            React.createElement("tbody", null, 
+            ners, 
+            React.createElement(QueryNewNER, {attributeList: this.props.attributeList})
+            )
+        )
+    }
+});
+
+// Query Name Entity Recognizer
+var QueryNER = React.createClass({displayName: "QueryNER",
+    render: function () {
+        return (
+            React.createElement("tr", null, 
+                React.createElement("td", {scope: "row"},  this.props.targetText), 
+                React.createElement("td", null,  this.props.targetKey), 
+                React.createElement("td", null, 
+                    React.createElement("button", {type: "button", className: "btn btn-danger"}, "Delete")
+                )
+            )
+        )
+    }
+});
+
+// New NER
+var QueryNewNER = React.createClass({displayName: "QueryNewNER",
+    render: function () {
+        return (
+            React.createElement("tr", null, 
+                React.createElement("th", null, React.createElement("input", {type: "text", className: "form-control", placeholder: "text"})), 
+                React.createElement("th", null, 
+                    React.createElement(QueryAttributeSelect, {attributeList: this.props.attributeList})
+                ), 
+                React.createElement("th", null, 
+                    React.createElement("button", {type: "button", className: "btn btn-success"}, "Add")
+                )
+            )
+        )
+    }
+});
+
+// Select combo-box for queries
+var QueryAttributeSelect = React.createClass({displayName: "QueryAttributeSelect",
+    render: function () {
+        return (
+            React.createElement("select", {className: "form-control"}, 
+                
+                    this.props.attributeList.map(function (attribute) {
+                        return (React.createElement("option", {value: attribute.attribute}, attribute.attribute))
+                    }.bind(this))
+                
+            )
+        )
+    }
+});
+
+ReactDOM.render(
+    React.createElement(QueryApp, null)
+    , document.getElementById("div-query-list")
 );
 
 },{"react":171,"react-dom":28}]},{},[172]);
