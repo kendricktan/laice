@@ -20808,8 +20808,11 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
     },
 
     handleQueryListAdd: function (query) {
-        console.log(query);
-        this.setState({queryList: [query].concat(this.state.queryList)});
+        // Refresh the entire array
+        // If we just concat one in front then it won't update the attributes
+        var tempQueryList = this.state.queryList;
+        this.setState({queryList: []});
+        this.setState({queryList: [query].concat(tempQueryList)});
     },
 
     handleAttributeSubmit: function (attr) {

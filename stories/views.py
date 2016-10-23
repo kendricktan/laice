@@ -1,3 +1,4 @@
+from laice.utils import spacy_ner
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, exceptions, status
@@ -98,42 +99,43 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         request_data['story'] = self.kwargs[self.first_key]
         serializer = self.input_serializer_class(data=request_data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        print(serializer.instance)
+        serializer.save() # Because we're using signals, there's a callback function for pre_save
+        # We therefore need to reload the instance into serializer
+        serializer = self.output_serializer_class(serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
-        querystrings = self.get_querystrings()
-        page = self.paginate_queryset(querystrings)
+        queries = self.get_queries( )
+        page = self.paginate_queryset(queries)
 
         if page is not None:
             serializer = self.output_serializer_class(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.output_serializer_class(querystrings, many=True)
+        serializer = self.output_serializer_class(queries, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
-        querystring = self.get_querystring()
-        serializer = self.output_serializer_class(querystring)
+        query = self.get_query()
+        serializer = self.output_serializer_class(query)
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        querystring = self.get_querystring()
-        querystring.delete()
+        query = self.get_query()
+        query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def get_querystring(self):
-        querystrings = self.get_querystrings()
+    def get_query(self):
+        queries = self.get_queries( )
         try:
-            querystring = querystrings.get(pk=self.kwargs[self.second_key])
+            query = queries.get(pk=self.kwargs[self.second_key])
         except (ObjectDoesNotExist):
             raise exceptions.NotFound()
-        return querystring
+        return query
 
-    def get_querystrings(self):
-        querystrings = self.get_object().query_set.all().order_by('-pk')
-        return querystrings
+    def get_queries(self):
+        queries = self.get_object().query_set.all().order_by('-pk')
+        return queries
 
 
 # Query Named entity relationship mapping
