@@ -6,23 +6,59 @@ var ReactDOM = require("react-dom");
 
 /* Inner story main app */
 var InnerStoryApp = React.createClass({
-    getInitialState: function(){
+    getInitialState: function () {
         return {
+            // Contains a list of attributes
             attributeList: [],
+            queryList: [
+                // querystring
+                // configured
+                // parsed_ner <- NER = named entity recognizer
+            ],
+            nextURL: ""
         }
     },
 
     componentDidMount: function () {
-        this.serverRequest = $.get("/api" + URL_PATH + "attributes/", function (attributes) {
+        $.get("/api" + URL_PATH + "attributes/", function (attributes) {
             this.setState({attributeList: attributes})
+        }.bind(this));
+
+        $.get("/api" + URL_PATH + "queries/", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next
+            })
         }.bind(this));
     },
 
-    handleAttributeSubmit: function(attr){
+    handleQueryListRemove: function (queryId) {
+        $.ajax({
+            url: "/api" + URL_PATH + "queries/" + queryId,
+            type: 'DELETE',
+            success: function (response) {
+                var newQueryList = this.state.queryList.filter(function (a) {
+                    return a.id != queryId;
+                });
+                this.setState({queryList: newQueryList});
+
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
+    handleQueryListAdd: function(query){
+        console.log(query);
+        this.setState({queryList: [query].concat(this.state.queryList)});
+    },
+
+    handleAttributeSubmit: function (attr) {
         this.setState({attributeList: this.state.attributeList.concat([attr])});
     },
 
-    handleAttributeDelete: function(attributeName){
+    handleAttributeDelete: function (attributeName) {
         var newAttributeList = this.state.attributeList.filter(function (a) {
             return a.attribute != attributeName;
         });
@@ -53,7 +89,7 @@ var InnerStoryApp = React.createClass({
 
                 <div className="well">
                     <h2>Manual query</h2>
-                    <ManualQuery/>
+                    <ManualQuery onQueryListAdd={this.handleQueryListAdd}/>
                 </div>
 
                 <br/>
@@ -77,7 +113,11 @@ var InnerStoryApp = React.createClass({
                 <br/>
                 <br/>
 
-                <QueryApp attributeList={this.state.attributeList}/>
+                <QueryApp
+                    attributeList={this.state.attributeList}
+                    queryList={this.state.queryList}
+                    onQueryListRemove={this.handleQueryListRemove}
+                />
             </div>
         )
     }
@@ -272,6 +312,7 @@ var ManualQuery = React.createClass({
             },
             success: function (response) {
                 this.refs.querystringInput.value = "";
+                this.props.onQueryListAdd(response);
             }.bind(this),
             error: function (response) {
                 this.props.onAttributeDuplicate();
@@ -296,41 +337,8 @@ var ManualQuery = React.createClass({
 
 /* View queries */
 var QueryApp = React.createClass({
-    getInitialState: function () {
-        return {
-            queryList: [
-                // querystring
-                // configured
-                // parsed_ner <- NER = named entity recognizer
-            ],
-            nextURL: "",
-        }
-    },
-
     handleQueryListRemove: function (queryId) {
-        $.ajax({
-            url: "/api" + URL_PATH + "queries/" + queryId,
-            type: 'DELETE',
-            success: function (response) {
-                var newQueryList = this.state.queryList.filter(function (a) {
-                    return a.id != queryId;
-                });
-                this.setState({queryList: newQueryList});
-
-            }.bind(this),
-            error: function (response) {
-                console.log(response);
-            }
-        });
-    },
-
-    componentDidMount: function () {
-        this.serverRequest = $.get("/api" + URL_PATH + "queries/", function (response) {
-            this.setState({
-                queryList: response.results,
-                nextURL: response.next
-            })
-        }.bind(this));
+        this.props.onQueryListRemove(queryId);
     },
 
     render: function () {
@@ -338,7 +346,7 @@ var QueryApp = React.createClass({
             <div>
                 <QueryList
                     handleQueryListRemove={this.handleQueryListRemove}
-                    queryList={this.state.queryList}
+                    queryList={this.props.queryList}
                     attributeList={this.props.attributeList}
                 />
             </div>

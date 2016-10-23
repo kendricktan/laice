@@ -99,6 +99,7 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         serializer = self.input_serializer_class(data=request_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        print(serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):

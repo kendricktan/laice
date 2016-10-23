@@ -36,7 +36,7 @@ class InputQuerySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Query
-        fields = ('querystring', 'story')
+        fields = ('id', 'querystring', 'story')
 
 
 class QuerySerializer(serializers.ModelSerializer):
