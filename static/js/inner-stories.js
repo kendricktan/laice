@@ -20807,7 +20807,7 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
         });
     },
 
-    handleQueryListAdd: function(query){
+    handleQueryListAdd: function (query) {
         console.log(query);
         this.setState({queryList: [query].concat(this.state.queryList)});
     },
@@ -21023,6 +21023,13 @@ var NewAttribute = React.createClass({displayName: "NewAttribute",
     handleSubmit: function (e) {
         e.preventDefault();
 
+        if (this.state.attribute == null || this.state.attribute == ""){
+            this.setState({labelText: "Attribute can\'t be empty!"});
+            return;
+        }
+
+        this.setState({labelText: ""});
+
         $.ajax({
             url: "/api" + URL_PATH + "attributes/",
             type: "POST",
@@ -21041,13 +21048,15 @@ var NewAttribute = React.createClass({displayName: "NewAttribute",
 
     getInitialState: function () {
         return {
-            attribute: ""
+            attribute: "",
+            labelText: ""
         };
     },
 
     render: function () {
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
+                React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
                 React.createElement("input", {ref: "attributeInput", name: "attribute", type: "text", className: "form-control", 
                        placeholder: "Story name (whitespaces will be trimed, special characters will be replaced with '-')", 
                        onChange: (e)=>this.setState({attribute: e.target.value})}), React.createElement("br", null), 
@@ -21059,8 +21068,21 @@ var NewAttribute = React.createClass({displayName: "NewAttribute",
 
 /* Manual query */
 var ManualQuery = React.createClass({displayName: "ManualQuery",
+    getInitialState: function(){
+        return {
+            labelText: ""
+        }
+    },
+
     handleSubmit: function (e) {
         e.preventDefault();
+
+        if (this.state.querystring == null || this.state.querystring == ""){
+            this.setState({labelText: "Querystring can\'t be null"});
+            return;
+        }
+
+        this.setState({labelText: ""});
 
         $.ajax({
             url: "/api" + URL_PATH + "queries/",
@@ -21082,6 +21104,7 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
                 React.createElement("p", null, 
+                    React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
                     React.createElement("input", {ref: "querystringInput", type: "text", placeholder: "'Turn the temperature down by 2 degrees'", 
                            className: "form-control", 
                            onChange: (e)=>this.setState({querystring: e.target.value})}
@@ -21261,7 +21284,9 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
     getInitialState(){
         return {
             targetAttribute: "",
-            targetText: ""
+            targetText: "",
+            labelText: "",
+            labelAttribute: ""
         }
     },
 
@@ -21270,7 +21295,23 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
     },
 
     onNERSubmit: function () {
-        this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
+        if (this.state.targetText != "" && this.state.targetAttribute != "") {
+            this.setState({labelText: "", labelAttribute: ""});
+            this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
+            return;
+        }
+
+        if (this.state.targetText == "") {
+            this.setState({labelText: "Your text can\'t be null"});
+        } else {
+            this.setState({labelText: ""});
+        }
+
+        if (this.state.labelAttribute == "") {
+            this.setState({labelAttribute: "Your attribute can\'t be null"});
+        } else {
+            this.setState({labelAttribute: ""});
+        }
     },
 
     render: function () {
@@ -21279,11 +21320,13 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
                 React.createElement("th", null, 
                     React.createElement("input", {type: "text", className: "form-control", placeholder: "text", 
                            onChange: (e)=>this.setState({targetText: e.target.value}), 
-                           ref: "targetTextInput"})
+                           ref: "targetTextInput"}), 
+                    React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText))
                 ), 
                 React.createElement("th", null, 
                     React.createElement(QueryAttributeSelect, {handleNERSelectAttribute: this.onNERSelectAttribute, 
-                                          attributeList: this.props.attributeList})
+                                          attributeList: this.props.attributeList}), 
+                    React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelAttribute))
                 ), 
                 React.createElement("th", null, 
                     React.createElement("button", {type: "button", className: "btn btn-success", 

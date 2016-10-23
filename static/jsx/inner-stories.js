@@ -49,7 +49,7 @@ var InnerStoryApp = React.createClass({
         });
     },
 
-    handleQueryListAdd: function(query){
+    handleQueryListAdd: function (query) {
         console.log(query);
         this.setState({queryList: [query].concat(this.state.queryList)});
     },
@@ -265,6 +265,13 @@ var NewAttribute = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
+        if (this.state.attribute == null || this.state.attribute == ""){
+            this.setState({labelText: "Attribute can\'t be empty!"});
+            return;
+        }
+
+        this.setState({labelText: ""});
+
         $.ajax({
             url: "/api" + URL_PATH + "attributes/",
             type: "POST",
@@ -283,13 +290,15 @@ var NewAttribute = React.createClass({
 
     getInitialState: function () {
         return {
-            attribute: ""
+            attribute: "",
+            labelText: ""
         };
     },
 
     render: function () {
         return (
             <form onSubmit={this.handleSubmit}>
+                <p><span className="label label-warning">{this.state.labelText}</span></p>
                 <input ref="attributeInput" name="attribute" type="text" className="form-control"
                        placeholder="Story name (whitespaces will be trimed, special characters will be replaced with '-')"
                        onChange={(e)=>this.setState({attribute: e.target.value})}/><br/>
@@ -301,8 +310,21 @@ var NewAttribute = React.createClass({
 
 /* Manual query */
 var ManualQuery = React.createClass({
+    getInitialState: function(){
+        return {
+            labelText: ""
+        }
+    },
+
     handleSubmit: function (e) {
         e.preventDefault();
+
+        if (this.state.querystring == null || this.state.querystring == ""){
+            this.setState({labelText: "Querystring can\'t be null"});
+            return;
+        }
+
+        this.setState({labelText: ""});
 
         $.ajax({
             url: "/api" + URL_PATH + "queries/",
@@ -324,6 +346,7 @@ var ManualQuery = React.createClass({
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>
+                    <p><span className="label label-warning">{this.state.labelText}</span></p>
                     <input ref="querystringInput" type="text" placeholder="'Turn the temperature down by 2 degrees'"
                            className="form-control"
                            onChange={(e)=>this.setState({querystring: e.target.value})}
@@ -503,7 +526,9 @@ var QueryNewNER = React.createClass({
     getInitialState(){
         return {
             targetAttribute: "",
-            targetText: ""
+            targetText: "",
+            labelText: "",
+            labelAttribute: ""
         }
     },
 
@@ -512,7 +537,23 @@ var QueryNewNER = React.createClass({
     },
 
     onNERSubmit: function () {
-        this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
+        if (this.state.targetText != "" && this.state.targetAttribute != "") {
+            this.setState({labelText: "", labelAttribute: ""});
+            this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
+            return;
+        }
+
+        if (this.state.targetText == "") {
+            this.setState({labelText: "Your text can\'t be null"});
+        } else {
+            this.setState({labelText: ""});
+        }
+
+        if (this.state.labelAttribute == "") {
+            this.setState({labelAttribute: "Your attribute can\'t be null"});
+        } else {
+            this.setState({labelAttribute: ""});
+        }
     },
 
     render: function () {
@@ -522,10 +563,12 @@ var QueryNewNER = React.createClass({
                     <input type="text" className="form-control" placeholder="text"
                            onChange={(e)=>this.setState({targetText: e.target.value})}
                            ref="targetTextInput"/>
+                    <p><span className="label label-warning">{this.state.labelText}</span></p>
                 </th>
                 <th>
                     <QueryAttributeSelect handleNERSelectAttribute={this.onNERSelectAttribute}
                                           attributeList={this.props.attributeList}/>
+                    <p><span className="label label-warning">{this.state.labelAttribute}</span></p>
                 </th>
                 <th>
                     <button type="button" className="btn btn-success"

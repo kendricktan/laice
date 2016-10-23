@@ -79,3 +79,10 @@ class Query(models.Model):
 
     def __str__(self):
         return self.querystring + ' | ' + str(self.story)
+
+    def save(self, *args, **kwargs):
+        # If model is already there, we're just
+        # updating it therefore it is configured
+        if self.pk:
+            self.configured = True
+        super().save(*args, **kwargs)
