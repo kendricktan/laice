@@ -157,12 +157,17 @@ class QueryNERViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
             query_ner = {}
 
         # Map that into the new query_ner
-        for key in ner:
-            query_ner[key] = ner[key]
+        for key in ner['ner']:
+            query_ner[key] = ner['ner'][key]
+
         query.parsed_ner = query_ner
         query.save()
 
-        return Response(status=status.HTTP_201_CREATED)
+        # AJAX datatype: json needs a body on 201
+        # or else it thinks it failed...
+        serializer = self.get_serializer(data=ner)
+        serializer.is_valid(raise_exception=True)
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
         query = self.get_query()
@@ -180,7 +185,7 @@ class QueryNERViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
             raise exceptions.ValidationError(detail={'Error': 'Can\'t delete empty item'})
 
         # Pop out keys specified in the ner
-        for key in ner:
+        for key in ner['ner']:
             if key in query_ner:
                 query_ner.pop(key)
 
@@ -193,9 +198,6 @@ class QueryNERViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         ner = serializer.validated_data
-
-        if 'ner' not in ner:
-            raise exceptions.ValidationError(detail={'ner': 'field can\'t be empty'})
 
         return ner
 

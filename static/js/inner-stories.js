@@ -21090,7 +21090,7 @@ var QueryList = React.createClass({displayName: "QueryList",
                         ), 
 
 
-                        React.createElement(QueryNERList, {attributeList: this.state.attributeList, nerDict: nerDict})
+                        React.createElement(QueryNERList, {attributeList: this.state.attributeList, nerDict: nerDict, queryId: query.id})
 
                     )
                 )
@@ -21106,20 +21106,77 @@ var QueryList = React.createClass({displayName: "QueryList",
 
 // Query NER List
 var QueryNERList = React.createClass({displayName: "QueryNERList",
+    getInitialState: function () {
+        return {
+            nerDict: this.props.nerDict
+        }
+    },
+
+    onNERDelete: function (NERText) {
+        // Only way to get the key to the hashmap/json
+        // to be obtained from variable name
+        var ner = {};
+        ner[NERText] = true;
+
+        $.ajax({
+            url: "/api" + URL_PATH + "queries/" + this.props.queryId + '/ner/',
+            type: 'DELETE',
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                ner
+            }),
+            success: function (response) {
+                var newNerDict = this.state.nerDict;
+                delete newNerDict[NERText];
+                this.setState({nerDict: newNerDict});
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
+    onNERCreate: function(targetText, targetAttribute){
+        var ner = {};
+        ner[targetText] = targetAttribute;
+
+        $.ajax({
+            url: "/api" + URL_PATH + "queries/" + this.props.queryId + '/ner/',
+            type: 'POST',
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                ner
+            }),
+            success: function(response){
+                var newNerDict = this.state.nerDict;
+                newNerDict[targetText] = targetAttribute;
+                this.setState({newDict: newNerDict});
+            }.bind(this),
+            error: function(response){
+                console.log(response);
+            }
+        })
+    },
+
     render: function () {
         var ners = [];
-        for (var key in this.props.nerDict) {
-            if (this.props.nerDict.hasOwnProperty(key)) {
-                var targetText = this.props.nerDict[key];
+        for (var key in this.state.nerDict) {
+            // Key is the text
+            // dict[key] contains the attribute
+            // this is so that key cannot be duplicated
+            if (this.state.nerDict.hasOwnProperty(key)) {
+                var tAttr = this.state.nerDict[key];
                 ners.push(
-                    React.createElement(QueryNER, {targetText: targetText, targetKey: key})
+                    React.createElement(QueryNER, {onNERDelete: this.onNERDelete, targetText: key, targetAttribute: tAttr})
                 )
             }
         }
         return (
             React.createElement("tbody", null, 
             ners, 
-            React.createElement(QueryNewNER, {attributeList: this.props.attributeList})
+            React.createElement(QueryNewNER, {onNERCreate: this.onNERCreate, attributeList: this.props.attributeList})
             )
         )
     }
@@ -21127,13 +21184,20 @@ var QueryNERList = React.createClass({displayName: "QueryNERList",
 
 // Query Name Entity Recognizer
 var QueryNER = React.createClass({displayName: "QueryNER",
+    onNERRemove: function (NERText) {
+        this.props.onNERDelete(NERText);
+    },
+
     render: function () {
         return (
             React.createElement("tr", null, 
                 React.createElement("td", {scope: "row"},  this.props.targetText), 
-                React.createElement("td", null,  this.props.targetKey), 
+                React.createElement("td", null,  this.props.targetAttribute), 
                 React.createElement("td", null, 
-                    React.createElement("button", {type: "button", className: "btn btn-danger"}, "Delete")
+                    React.createElement("button", {type: "button", className: "btn btn-danger", 
+                            onClick: (e)=>this.onNERRemove(this.props.targetText)}, 
+                        "Delete"
+                    )
                 )
             )
         )
@@ -21142,15 +21206,37 @@ var QueryNER = React.createClass({displayName: "QueryNER",
 
 // New NER
 var QueryNewNER = React.createClass({displayName: "QueryNewNER",
+    getInitialState(){
+        return {
+            targetAttribute: "",
+            targetText: ""
+        }
+    },
+
+    onNERSelectAttribute: function(val){
+        this.setState({targetAttribute: val});
+    },
+
+    onNERSubmit: function () {
+        this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
+    },
+
     render: function () {
         return (
             React.createElement("tr", null, 
-                React.createElement("th", null, React.createElement("input", {type: "text", className: "form-control", placeholder: "text"})), 
                 React.createElement("th", null, 
-                    React.createElement(QueryAttributeSelect, {attributeList: this.props.attributeList})
+                    React.createElement("input", {type: "text", className: "form-control", placeholder: "text", 
+                           onChange: (e)=>this.setState({targetText: e.target.value}), 
+                           ref: "targetTextInput"})
                 ), 
                 React.createElement("th", null, 
-                    React.createElement("button", {type: "button", className: "btn btn-success"}, "Add")
+                    React.createElement(QueryAttributeSelect, {handleNERSelectAttribute: this.onNERSelectAttribute, 
+                                          attributeList: this.props.attributeList})
+                ), 
+                React.createElement("th", null, 
+                    React.createElement("button", {type: "button", className: "btn btn-success", 
+                            onClick: this.onNERSubmit}, "Add"
+                    )
                 )
             )
         )
@@ -21159,9 +21245,14 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
 
 // Select combo-box for queries
 var QueryAttributeSelect = React.createClass({displayName: "QueryAttributeSelect",
+    onSelectChange: function(val){
+        this.props.handleNERSelectAttribute(val);
+    },
+
     render: function () {
         return (
-            React.createElement("select", {className: "form-control"}, 
+            React.createElement("select", {onChange: (e)=>this.onSelectChange(e.target.value), className: "form-control"}, 
+                React.createElement("option", {selected: true, disabled: true}, "..."), 
                 
                     this.props.attributeList.map(function (attribute) {
                         return (React.createElement("option", {value: attribute.attribute}, attribute.attribute))

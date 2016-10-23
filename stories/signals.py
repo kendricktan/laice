@@ -13,6 +13,8 @@ def parse_ner(sender, instance, created, **kwargs):
     # If its being created, it is assumed that it wants
     # to be automatically parsed
     if created:
+        # Remember that key is the text
+        # and the dict[key] contains the attribute (or entity)
         print('Query created for ', str(instance))
 
     # If its being updated, it is assumed that it wants

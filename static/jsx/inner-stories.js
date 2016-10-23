@@ -332,7 +332,7 @@ var QueryList = React.createClass({
                         </thead>
 
 
-                        <QueryNERList attributeList={this.state.attributeList} nerDict={nerDict}/>
+                        <QueryNERList attributeList={this.state.attributeList} nerDict={nerDict} queryId={query.id}/>
 
                     </table>
                 </div>
@@ -348,20 +348,77 @@ var QueryList = React.createClass({
 
 // Query NER List
 var QueryNERList = React.createClass({
+    getInitialState: function () {
+        return {
+            nerDict: this.props.nerDict
+        }
+    },
+
+    onNERDelete: function (NERText) {
+        // Only way to get the key to the hashmap/json
+        // to be obtained from variable name
+        var ner = {};
+        ner[NERText] = true;
+
+        $.ajax({
+            url: "/api" + URL_PATH + "queries/" + this.props.queryId + '/ner/',
+            type: 'DELETE',
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                ner
+            }),
+            success: function (response) {
+                var newNerDict = this.state.nerDict;
+                delete newNerDict[NERText];
+                this.setState({nerDict: newNerDict});
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
+    onNERCreate: function(targetText, targetAttribute){
+        var ner = {};
+        ner[targetText] = targetAttribute;
+
+        $.ajax({
+            url: "/api" + URL_PATH + "queries/" + this.props.queryId + '/ner/',
+            type: 'POST',
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                ner
+            }),
+            success: function(response){
+                var newNerDict = this.state.nerDict;
+                newNerDict[targetText] = targetAttribute;
+                this.setState({newDict: newNerDict});
+            }.bind(this),
+            error: function(response){
+                console.log(response);
+            }
+        })
+    },
+
     render: function () {
         var ners = [];
-        for (var key in this.props.nerDict) {
-            if (this.props.nerDict.hasOwnProperty(key)) {
-                var targetText = this.props.nerDict[key];
+        for (var key in this.state.nerDict) {
+            // Key is the text
+            // dict[key] contains the attribute
+            // this is so that key cannot be duplicated
+            if (this.state.nerDict.hasOwnProperty(key)) {
+                var tAttr = this.state.nerDict[key];
                 ners.push(
-                    <QueryNER targetText={targetText} targetKey={key}/>
+                    <QueryNER onNERDelete={this.onNERDelete} targetText={key} targetAttribute={tAttr}/>
                 )
             }
         }
         return (
             <tbody>
             {ners}
-            <QueryNewNER attributeList={this.props.attributeList}/>
+            <QueryNewNER onNERCreate={this.onNERCreate} attributeList={this.props.attributeList}/>
             </tbody>
         )
     }
@@ -369,13 +426,20 @@ var QueryNERList = React.createClass({
 
 // Query Name Entity Recognizer
 var QueryNER = React.createClass({
+    onNERRemove: function (NERText) {
+        this.props.onNERDelete(NERText);
+    },
+
     render: function () {
         return (
             <tr>
                 <td scope="row">{ this.props.targetText }</td>
-                <td>{ this.props.targetKey }</td>
+                <td>{ this.props.targetAttribute }</td>
                 <td>
-                    <button type="button" className="btn btn-danger">Delete</button>
+                    <button type="button" className="btn btn-danger"
+                            onClick={(e)=>this.onNERRemove(this.props.targetText)}>
+                        Delete
+                    </button>
                 </td>
             </tr>
         )
@@ -384,15 +448,37 @@ var QueryNER = React.createClass({
 
 // New NER
 var QueryNewNER = React.createClass({
+    getInitialState(){
+        return {
+            targetAttribute: "",
+            targetText: ""
+        }
+    },
+
+    onNERSelectAttribute: function(val){
+        this.setState({targetAttribute: val});
+    },
+
+    onNERSubmit: function () {
+        this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
+    },
+
     render: function () {
         return (
             <tr>
-                <th><input type="text" className="form-control" placeholder="text"/></th>
                 <th>
-                    <QueryAttributeSelect attributeList={this.props.attributeList}/>
+                    <input type="text" className="form-control" placeholder="text"
+                           onChange={(e)=>this.setState({targetText: e.target.value})}
+                           ref="targetTextInput"/>
                 </th>
                 <th>
-                    <button type="button" className="btn btn-success">Add</button>
+                    <QueryAttributeSelect handleNERSelectAttribute={this.onNERSelectAttribute}
+                                          attributeList={this.props.attributeList}/>
+                </th>
+                <th>
+                    <button type="button" className="btn btn-success"
+                            onClick={this.onNERSubmit}>Add
+                    </button>
                 </th>
             </tr>
         )
@@ -401,9 +487,14 @@ var QueryNewNER = React.createClass({
 
 // Select combo-box for queries
 var QueryAttributeSelect = React.createClass({
+    onSelectChange: function(val){
+        this.props.handleNERSelectAttribute(val);
+    },
+
     render: function () {
         return (
-            <select className="form-control">
+            <select onChange={(e)=>this.onSelectChange(e.target.value)} className="form-control">
+                <option selected disabled>...</option>
                 {
                     this.props.attributeList.map(function (attribute) {
                         return (<option value={attribute.attribute}>{attribute.attribute}</option>)
