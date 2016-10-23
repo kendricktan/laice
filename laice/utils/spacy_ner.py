@@ -1,106 +1,119 @@
 from __future__ import unicode_literals, print_function
-import json
-import pathlib
+
+import os
 import random
+from pprint import pprint
 
 import spacy
-from spacy.pipeline import EntityRecognizer
+from django.conf import settings
 from spacy.gold import GoldParse
+from spacy.pipeline import EntityRecognizer
 
 
-def train_ner(nlp, train_data, entity_types):
-    ner = EntityRecognizer(nlp.vocab, entity_types=entity_types)
-    for itn in range(15):
-        random.shuffle(train_data)
-        for raw_text, entity_offsets in train_data:
-            doc = nlp.make_doc(raw_text)
-            gold = GoldParse(doc, entities=entity_offsets)
-            ner.update(doc, gold)
-    ner.model.end_training()
-    return ner
+# Trains our query object
+def train_query(queryObj):
+    # Our query string
+    story = queryObj.story
+    querystring = queryObj.querystring
+    parsed_ner = queryObj.parsed_ner
 
+    # Where our model is located
+    model_path = os.path.normpath( os.path.join( settings.SPACYMODEL_DIR, str( story.name ) ) )
 
-def get_ner(phrase, model_dir=None):
-    if model_dir is not None:
-        model_dir = pathlib.Path(model_dir)
-        if not model_dir.exists():
-            model_dir.mkdir()
-        assert model_dir.is_dir()
+    # NLP Module
+    nlp = spacy.load( 'en', parser=False, entity=False, vectors=False )
 
-    nlp = spacy.load('en', parser=False, entity=False, vectors=False)
+    ENTITY_OFFSETS = []
+    ENTITY_LIST = []
+    for txt in parsed_ner:
+        cur_entity = parsed_ner[txt]
+        cur_index = querystring.find( txt )
+        # If string is found in querystring
+        if cur_index != -1:
+            ENTITY_OFFSETS.append( (cur_index, cur_index + len( txt ), cur_entity) )
 
-    train_data = [
+            # Add entity to entity list if its not in there
+            if cur_entity not in ENTITY_LIST:
+                ENTITY_LIST.append( cur_entity )
+
+    # Our training data
+    TRAIN_DATA = [
         (
-            'Get me some pens',
-            [(len(''), len('Get'), 'ACTION'),
-             (len('Get me some '), len('Get me some pens'), 'OBJ')]
+            querystring,
+            ENTITY_OFFSETS
         ),
-        (
-            'Get me some potatoes',
-            [(len(''), len('Get'), 'ACTION'),
-             (len('Get me some '), len('Get me some potatoes'), 'OBJ')]
-        ),
-        (
-            'Get me a piece of paper',
-            [(len(''), len('Get'), 'ACTION'),
-             (len('Get me a piece of '), len('Get me a piece of paper'), 'OBJ')]
-        ),
-        (
-            'Give me those cookies',
-            [(len(''), len('Give'), 'ACTION'),
-             (len('Give me those '), len('Give me those cookies'), 'OBJ')]
-        )
     ]
-    ner = train_ner(nlp, train_data, ['ACTION', 'OBJ'])
 
-    doc = nlp.make_doc(phrase)
-    nlp.tagger(doc)
-    ner(doc)
+    pprint(ENTITY_OFFSETS)
+
+    # Trains the model
+    # loads up existing data if they exist
+    ner = EntityRecognizer( nlp.vocab, entity_types=ENTITY_LIST )
+
+    # If our model exists, we load it
+    if os.path.isfile( model_path ):
+        ner.model.load( model_path )
+
+    for itn in range( 5 ):
+        random.shuffle( TRAIN_DATA )
+        for raw_text, entity_offsets in TRAIN_DATA:
+            doc = nlp.make_doc( raw_text )
+            gold = GoldParse( doc, entities=entity_offsets )
+            ner.update( doc, gold )
+    ner.model.end_training( )
+
+    # Save model
+    ner.model.dump( model_path )
+
+
+# Gets our query object
+def get_query(queryObj):
+    # Our query string
+    story = queryObj.story
+    querystring = queryObj.querystring
+    parsed_ner = queryObj.parsed_ner
+
+    # Where our model is located
+    model_path = os.path.normpath( os.path.join( settings.SPACYMODEL_DIR, str( story.name ) ) )
+
+    ENTITY_LIST = []
+    for attribute in story.storyattribute_set.all():
+        ENTITY_LIST.append(str(attribute.attribute))
+
+    print(ENTITY_LIST)
+
+    # Initialize Spacy modules
+    nlp = spacy.load( 'en', parser=False, entity=False, vectors=False )
+    ner = EntityRecognizer( nlp.vocab, entity_types=ENTITY_LIST )
+
+    if os.path.isfile( model_path ):
+        ner.model.load( model_path )
+
+    # Creates a tagger
+    doc = nlp.make_doc( querystring )
+    nlp.tagger( doc )
+    ner( doc )
 
     # Formatted Dic, or in JSON format
-    output_dict = {}
+    ner_dict = {}
 
     for word in doc:
         if word.ent_type_ is not None and word.ent_type_ is not '':
-            output_dict[word.ent_type_] = word.text
+            ner_dict[word.text] = word.ent_type_
 
-    import pprint
+    pprint( ner_dict )
 
-    pprint.pprint(output_dict)
-
-    # Save model?
-    if model_dir is not None:
-        with (model_dir / 'config.json').open('w') as file_:
-            json.dump(ner.cfg, file_)
-        ner.model.dump(str(model_dir / 'model'))
-
-def get_ner_from_load(phrase, model_dir=None):
-    if model_dir is not None:
-        model_dir = pathlib.Path(model_dir)
-        if not model_dir.exists():
-            model_dir.mkdir()
-        assert model_dir.is_dir()
-
-    nlp = spacy.load('en', parser=False, entity=False, vectors=False)
-    ner = EntityRecognizer(nlp.vocab, entity_types=['ACTION', 'OBJ'])
-    ner.model.load(str(model_dir / 'model'))
-
-    doc = nlp.make_doc(phrase)
-    nlp.tagger(doc)
-    ner(doc)
-
-    # Formatted Dic, or in JSON format
-    output_dict = {}
-
-    for word in doc:
-        if word.ent_type_ is not None and word.ent_type_ is not '':
-            output_dict[word.ent_type_] = word.text
-
-    import pprint
-
-    pprint.pprint(output_dict)
+    # Save dict as our parsed ner
+    queryObj.parsed_ner = ner_dict
 
 
-if __name__ == '__main__':
-    get_ner('Give me those bottles', 'new_model')
-    get_ner_from_load('Get me those chopsticks', 'new_model')
+# Cleans our query object (on deletion)
+def clean_query(queryObj):
+    # Cleans up models left over by queryObj
+    story = queryObj.story
+
+    # Where our model is located
+    model_path = os.path.normpath( os.path.join( settings.SPACYMODEL_DIR, str( story.name ) ) )
+
+    if os.path.isfile( model_path ):
+        os.remove( model_path )

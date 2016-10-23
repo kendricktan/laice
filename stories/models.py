@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from annoying.fields import JSONField
 
 from rest_framework import exceptions
@@ -58,6 +59,10 @@ class StoryAttribute(models.Model):
         self.perform_clean()
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # Delete saved model here
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return self.attribute + ' | ' + str(self.story)
 
@@ -79,10 +84,3 @@ class Query(models.Model):
 
     def __str__(self):
         return self.querystring + ' | ' + str(self.story)
-
-    def save(self, *args, **kwargs):
-        # If model is already there, we're just
-        # updating it therefore it is configured
-        if self.pk:
-            self.configured = True
-        super().save(*args, **kwargs)

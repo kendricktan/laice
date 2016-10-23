@@ -1,11 +1,12 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_delete
 from django.dispatch import receiver
 from django.conf import settings
+from laice.utils import spacy_ner
 
 from stories.models import Query
 
-@receiver(post_save, sender=Query)
-def parse_ner(sender, instance, created, **kwargs):
+@receiver(pre_save, sender=Query)
+def parse_ner(sender, instance, *args, **kwargs):
     """
     Callback function that occurs whenever a Query
     object is created. Used to parse NER
@@ -13,13 +14,20 @@ def parse_ner(sender, instance, created, **kwargs):
 
     # If its being created, it is assumed that it wants
     # to be automatically parsed
-    if created:
+    if instance.pk is None:
         # Remember that key is the text
         # and the dict[key] contains the attribute (or entity)
         print('Query created for ', str(instance))
+        spacy_ner.get_query(instance)
 
     # If its being updated, it is assumed that it wants
     # to be manually parsed and should be fed back into
     # the training data
-    elif not created:
+    else:
+        instance.configured = True
         print('Query updated for ', str(instance))
+        spacy_ner.train_query(instance)
+
+# @receiver(post_delete, sender=Query)
+# def delete_ner(sender, instance, using, **kwargs):
+#     spacy_ner.clean_query(instance)

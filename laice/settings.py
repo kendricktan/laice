@@ -139,3 +139,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+# Where our models will be saved
+SPACYMODEL_DIR = os.path.normpath(os.path.join(BASE_DIR, 'nlp_models'))
+
+if not os.path.isdir(SPACYMODEL_DIR):
+    os.mkdir(SPACYMODEL_DIR)
+assert os.path.exists(SPACYMODEL_DIR)
