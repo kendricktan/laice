@@ -224,7 +224,8 @@ var ManualQuery = React.createClass({
                 <p>
                     <input ref="querystringInput" type="text" placeholder="'Turn the temperature down by 2 degrees'"
                            className="form-control"
-                           onChange={(e)=>this.setState({querystring: e.target.value})}/>
+                           onChange={(e)=>this.setState({querystring: e.target.value})}
+                    />
                 </p>
                 <button type="submit" className="btn btn-block btn-default btn-primary">Query</button>
             </form>
@@ -249,6 +250,23 @@ var QueryApp = React.createClass({
         }
     },
 
+    handleQueryListRemove: function (queryId) {
+        $.ajax({
+            url: "/api" + URL_PATH + "queries/" + queryId,
+            type: 'DELETE',
+            success: function (response) {
+                var newQueryList = this.state.queryList.filter(function (a) {
+                    return a.id != queryId;
+                });
+                this.setState({queryList: newQueryList});
+
+            }.bind(this),
+            error: function (response) {
+                console.log(response);
+            }
+        });
+    },
+
     componentDidMount: function () {
         this.serverRequest = $.get("/api" + URL_PATH + "queries/", function (response) {
             this.setState({
@@ -261,7 +279,10 @@ var QueryApp = React.createClass({
     render: function () {
         return (
             <div>
-                <QueryList queryList={this.state.queryList}/>
+                <QueryList
+                    handleQueryListRemove={this.handleQueryListRemove}
+                    queryList={this.state.queryList}
+                />
             </div>
         );
     }
@@ -282,6 +303,10 @@ var QueryList = React.createClass({
         }.bind(this));
     },
 
+    onQueryListDelete: function (queryId) {
+        this.props.handleQueryListRemove(queryId);
+    },
+
     render: function () {
         var queries = [];
         this.props.queryList.map(function (query) {
@@ -289,7 +314,12 @@ var QueryList = React.createClass({
             var nerDict = query.parsed_ner ? query.parsed_ner : {};
             queries.push(
                 <div className="well">
-                    <h4><span className={gylClass}></span>&nbsp; {query.querystring}</h4>
+                    <h4>
+                        <button onClick={()=>this.onQueryListDelete(query.id)} type="submit"
+                                className="pull-right btn btn-default btn-danger">Delete
+                        </button>
+                        <span className={gylClass}></span>&nbsp; {query.querystring}</h4>
+
                     <hr/>
 
                     <table className="table">

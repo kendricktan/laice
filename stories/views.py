@@ -125,7 +125,7 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
     def get_querystring(self):
         querystrings = self.get_querystrings()
         try:
-            querystring = querystrings.get(pk=self.kwargs[int(self.second_key)])
+            querystring = querystrings.get(pk=self.kwargs[self.second_key])
         except (ObjectDoesNotExist):
             raise exceptions.NotFound()
         return querystring
