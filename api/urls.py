@@ -6,6 +6,7 @@ from stories.views import (
     StoryViewSet,
     StoryAttributeViewSet,
     QueryViewSet,
+    QueryNERViewSet
 )
 
 urlpatterns = [
@@ -14,11 +15,15 @@ urlpatterns = [
 
     url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/attributes/$', StoryAttributeViewSet.list_mapping(),
         name='story_attribute_list'),
-    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/attributes/(?P<attribute_name>[A-Za-z0-9]+)/$', StoryAttributeViewSet.detail_mapping(),
+    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/attributes/(?P<attribute_name>[A-Za-z0-9]+)/$',
+        StoryAttributeViewSet.detail_mapping(),
         name='story_attribute_detail'),
 
     url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/queries/$', QueryViewSet.list_mapping(),
-            name='query_list'),
+        name='query_list'),
     url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/queries/(?P<query_id>[0-9]+)/$', QueryViewSet.detail_mapping(),
         name='query_detail'),
+
+    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/queries/(?P<query_id>[0-9]+)/ner/$', QueryNERViewSet.list_mapping(),
+        name='query_ner_list'),
 ]

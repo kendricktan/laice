@@ -45,3 +45,10 @@ class QuerySerializer(serializers.ModelSerializer):
     class Meta:
         model = Query
         fields = ('id', 'querystring', 'configured', 'parsed_ner')
+
+
+class QueryNERSerializer(serializers.Serializer):
+    ner = serializers.DictField()
+
+    class Meta:
+        fields = ('parsed_ner',)

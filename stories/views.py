@@ -1,19 +1,19 @@
-from laice.core.viewsets import ViewMappingMixin
-
-from django.shortcuts import render, get_object_or_404, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, exceptions, status
 from rest_framework.response import Response
 
-from stories.viewsets import GetStoryMixin
-from stories.models import Story, StoryAttribute
+from laice.core.viewsets import ViewMappingMixin
+from stories.models import Story
 from stories.serializers import (
     StorySerializer,
     StoryAttributeSerializer,
     InputStoryAttributeSerializer,
     QuerySerializer,
-    InputQuerySerializer
+    InputQuerySerializer,
+    QueryNERSerializer
 )
+from stories.viewsets import GetStoryMixin
 
 
 # Render views
@@ -133,3 +133,76 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
     def get_querystrings(self):
         querystrings = self.get_object().query_set.all().order_by('-pk')
         return querystrings
+
+
+# Query Named entity relationship mapping
+class QueryNERViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
+    list_methods = ['create', 'destroy', 'list']
+
+    queryset = Story.objects.all()
+    serializer_class = QueryNERSerializer
+
+    second_key = 'query_id'
+
+    # Create just appends it to the parsed NER
+    def create(self, request, *args, **kwargs):
+        # Gets the new NER
+        ner = self.get_new_ner(data=request.data)
+
+        # ner contains a new attribute that we wanna map to our query
+        query = self.get_query()
+        query_ner = query.parsed_ner
+
+        if query_ner is None:
+            query_ner = {}
+
+        # Map that into the new query_ner
+        for key in ner:
+            query_ner[key] = ner[key]
+        query.parsed_ner = query_ner
+        query.save()
+
+        return Response(status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        query = self.get_query()
+        serializer = self.get_serializer({'ner': query.parsed_ner})
+        return Response(serializer.data['ner'])
+
+    def destroy(self, request, *args, **kwargs):
+        # Gets the new NER
+        ner = self.get_new_ner(data=request.data)
+
+        query = self.get_query()
+        query_ner = query.parsed_ner
+
+        if query_ner is None:
+            raise exceptions.ValidationError(detail={'Error': 'Can\'t delete empty item'})
+
+        # Pop out keys specified in the ner
+        for key in ner:
+            if key in query_ner:
+                query_ner.pop(key)
+
+        query.parsed_ner = query_ner
+        query.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_new_ner(self, data):
+        # Serializing the request
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        ner = serializer.validated_data
+
+        if 'ner' not in ner:
+            raise exceptions.ValidationError(detail={'ner': 'field can\'t be empty'})
+
+        return ner
+
+    def get_query(self):
+        story = self.get_object()
+        try:
+            query = story.query_set.get(id=self.kwargs[self.second_key])
+        except (ObjectDoesNotExist):
+            raise exceptions.NotFound()
+        return query
