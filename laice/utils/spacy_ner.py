@@ -108,10 +108,8 @@ def get_query(queryObj):
 
 
 # Cleans our query object (on deletion)
-def clean_query(queryObj):
-    # Cleans up models left over by queryObj
-    story = queryObj.story
-
+def clean_story(story):
+    # Cleans up models left over by story
     # Where our model is located
     model_path = os.path.normpath( os.path.join( settings.SPACYMODEL_DIR, str( story.name ) ) )
 

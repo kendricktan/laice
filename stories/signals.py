@@ -1,9 +1,9 @@
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import pre_save, pre_delete
 from django.dispatch import receiver
 from django.conf import settings
 from laice.utils import spacy_ner
 
-from stories.models import Query
+from stories.models import Query, Story
 
 @receiver(pre_save, sender=Query)
 def parse_ner(sender, instance, *args, **kwargs):
@@ -28,6 +28,6 @@ def parse_ner(sender, instance, *args, **kwargs):
         print('Query updated for ', str(instance))
         spacy_ner.train_query(instance)
 
-# @receiver(post_delete, sender=Query)
-# def delete_ner(sender, instance, using, **kwargs):
-#     spacy_ner.clean_query(instance)
+@receiver(pre_delete, sender=Story)
+def delete_ner(sender, instance, using, **kwargs):
+    spacy_ner.clean_story(instance)
