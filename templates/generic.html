@@ -44,12 +44,12 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="{% block dashboard_active %}{% endblock %}"><a href="{% url 'dashboard_view' %}">Dashboard</a></li>
+                <li class="{% block dashboard_active %}{% endblock %}"><a
+                        href="{% url 'dashboard_view' %}">Dashboard</a></li>
                 <li class="{% block stories_active %}{% endblock %}"><a href="{% url 'stories_view' %}">Stories</a></li>
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li class="{% block about_active %}{% endblock %}"><a href="#">About</a></li>
                 <li class="{% block help_active %}{% endblock %}"><a href="{% url 'help_view' %}">Help</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
@@ -66,6 +66,28 @@
         <div class="col-md-2"></div>
     </div>
 </div>
+
+<!-- Footer -->
+<hr/>
+<div class="container">
+    <div class="row">
+        <footer class="footer">
+            <div class="text-muted">
+                <p class="text-center">
+                    Made with
+                    <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>
+                    by <a href="https://github.com/kendricktan">kendricktan</a>
+                </p>
+                <p class="text-center">
+                    <a href="/about/">About</a> &nbsp; | &nbsp;
+                    <a href="https://github.com/kendricktan/laice">Contribute</a> &nbsp; | &nbsp;
+                    <a href="https://github.com/kendricktan/laice/blob/master/LICENSE">MIT Licensed</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+</div>
+<hr/>
 
 <!-- scripts -->
 <script>

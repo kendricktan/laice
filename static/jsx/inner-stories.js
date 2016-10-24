@@ -15,7 +15,8 @@ var InnerStoryApp = React.createClass({
                 // configured
                 // parsed_ner <- NER = named entity recognizer
             ],
-            nextURL: ""
+            nextURL: "",
+            prevURL: ""
         }
     },
 
@@ -27,7 +28,8 @@ var InnerStoryApp = React.createClass({
         $.get("/api" + URL_PATH + "queries/", function (response) {
             this.setState({
                 queryList: response.results,
-                nextURL: response.next
+                nextURL: response.next,
+                prevURL: response.previous
             })
         }.bind(this));
     },
@@ -69,7 +71,42 @@ var InnerStoryApp = React.createClass({
         this.setState({attributeList: newAttributeList});
     },
 
+    handleNextPage: function () {
+        $.get(this.state.nextURL, function (response) {
+            this.setState({
+                queryList: [],
+            });
+
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
+
+    handlePrevPage: function () {
+        $.get(this.state.prevURL, function (response) {
+            this.setState({
+                queryList: [],
+            });
+
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
+
+
     render: function () {
+        var prevButton = (this.state.prevURL != null) ?
+            <button onClick={this.handlePrevPage} type="button" className="btn btn-default">Previous</button> : "";
+
+        var nextButton = (this.state.nextURL != null) ?
+            <button onClick={this.handleNextPage} type="button" className="pull-right btn btn-default">Next</button> : "";
+
         return (
             <div>
                 <div className="well">
@@ -122,6 +159,11 @@ var InnerStoryApp = React.createClass({
                     queryList={this.state.queryList}
                     onQueryListRemove={this.handleQueryListRemove}
                 />
+
+                <hr/>
+
+                {prevButton}
+                {nextButton}
             </div>
         )
     }
@@ -269,7 +311,7 @@ var NewAttribute = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        if (this.state.attribute == null || this.state.attribute == ""){
+        if (this.state.attribute == null || this.state.attribute == "") {
             this.setState({labelText: "Attribute can\'t be empty!"});
             return;
         }
@@ -314,7 +356,7 @@ var NewAttribute = React.createClass({
 
 /* Manual query */
 var ManualQuery = React.createClass({
-    getInitialState: function(){
+    getInitialState: function () {
         return {
             labelText: ""
         }
@@ -323,7 +365,7 @@ var ManualQuery = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        if (this.state.querystring == null || this.state.querystring == ""){
+        if (this.state.querystring == null || this.state.querystring == "") {
             this.setState({labelText: "Querystring can\'t be null"});
             return;
         }
@@ -411,7 +453,8 @@ var QueryList = React.createClass({
                         </thead>
 
 
-                        <QueryNERList querystring={query.querystring} attributeList={this.props.attributeList} nerDict={nerDict} queryId={query.id}/>
+                        <QueryNERList querystring={query.querystring} attributeList={this.props.attributeList}
+                                      nerDict={nerDict} queryId={query.id}/>
 
                     </table>
                 </div>
@@ -497,7 +540,8 @@ var QueryNERList = React.createClass({
         return (
             <tbody>
             {ners}
-            <QueryNewNER querystring={this.props.querystring} onNERCreate={this.onNERCreate} attributeList={this.props.attributeList} />
+            <QueryNewNER querystring={this.props.querystring} onNERCreate={this.onNERCreate}
+                         attributeList={this.props.attributeList}/>
             </tbody>
         )
     }
@@ -540,7 +584,7 @@ var QueryNewNER = React.createClass({
         this.setState({targetAttribute: val});
     },
 
-    onNERSelectTargetText: function(val){
+    onNERSelectTargetText: function (val) {
         this.setState({targetText: val});
     },
 
@@ -591,16 +635,16 @@ var QueryNewNER = React.createClass({
 
 // Query target text
 var QueryTargetTextSelect = React.createClass({
-    onSelectChange: function(val){
+    onSelectChange: function (val) {
         this.props.handleNERSelectTargetText(val);
     },
 
-    render: function(){
+    render: function () {
         return (
             <select onChange={(e)=>this.onSelectChange(e.target.value)} className="form-control">
                 <option selected disabled>...</option>
                 {
-                    this.props.querystring.split(" ").map(function(txt){
+                    this.props.querystring.split(" ").map(function (txt) {
                         return (<option value={txt}>{txt}</option>)
                     }.bind(this))
                 }

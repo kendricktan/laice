@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from laice.utils import spacy_ner
 
 from laice.core.viewsets import ViewMappingMixin
-from stories.models import Story
+from stories.models import Story, Query
 from stories.serializers import (
     StorySerializer,
     StoryAttributeSerializer,
