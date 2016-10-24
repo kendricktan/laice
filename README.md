@@ -38,6 +38,10 @@ python3 -m spacy.en.download –force all
 
 python3 manage.py runserver
 ```
+If you get an error on first time run, you may need to issue the following command: 
+```
+python3 manage.py migrate
+```
 
 Then navigate to `http://127.0.0.1:8000` to view your own Natural Language Processor!
 
