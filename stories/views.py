@@ -34,7 +34,7 @@ class StoryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
     serializer_class = StorySerializer
 
     def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.queryset, many=True)
+        serializer = self.get_serializer(Story.objects.all(), many=True)
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
