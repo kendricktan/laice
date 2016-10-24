@@ -119,7 +119,7 @@ var InnerStoryApp = React.createClass({
     handleViewUnconfiguredQueryList: function(e){
         e.preventDefault();
         this.setState({
-            queryListViewLabel: "View: all",
+            queryListViewLabel: "View: unconfigured",
             queryList: []
 
         });
@@ -136,7 +136,7 @@ var InnerStoryApp = React.createClass({
     handleViewConfiguredQueryList: function(e){
         e.preventDefault();
         this.setState({
-            queryListViewLabel: "View: all",
+            queryListViewLabel: "View: configured",
             queryList: []
 
         });

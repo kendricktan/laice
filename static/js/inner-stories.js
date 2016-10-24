@@ -20877,7 +20877,7 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
     handleViewUnconfiguredQueryList: function(e){
         e.preventDefault();
         this.setState({
-            queryListViewLabel: "View: all",
+            queryListViewLabel: "View: unconfigured",
             queryList: []
 
         });
@@ -20894,7 +20894,7 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
     handleViewConfiguredQueryList: function(e){
         e.preventDefault();
         this.setState({
-            queryListViewLabel: "View: all",
+            queryListViewLabel: "View: configured",
             queryList: []
 
         });
