@@ -56,9 +56,6 @@ def train_query(queryObj):
     ner = EntityRecognizer( nlp.vocab, entity_types=ENTITY_LIST )
 
     # If our model exists, we load it
-    if os.path.isfile( model_path ):
-        ner.model.load( model_path )
-
     for itn in range( 5 ):
         random.shuffle( TRAIN_DATA )
         for raw_text, entity_offsets in TRAIN_DATA:
