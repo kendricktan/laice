@@ -20798,6 +20798,7 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
                 var newQueryList = this.state.queryList.filter(function (a) {
                     return a.id != queryId;
                 });
+                this.setState({queryList: []});
                 this.setState({queryList: newQueryList});
 
             }.bind(this),
@@ -20820,10 +20821,10 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
     },
 
     handleAttributeDelete: function (attributeName) {
+        this.setState({attributeList: []});
         var newAttributeList = this.state.attributeList.filter(function (a) {
             return a.attribute != attributeName;
         });
-        this.setState({attributeList: []});
         this.setState({attributeList: newAttributeList});
     },
 

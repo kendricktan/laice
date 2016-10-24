@@ -4,7 +4,6 @@ import os
 import random
 
 import spacy
-
 from spacy.tagger import Tagger
 from django.conf import settings
 from spacy.gold import GoldParse
@@ -14,8 +13,9 @@ from spacy.pipeline import EntityRecognizer
 # NLP Module
 nlp = spacy.load('en', parser=False, entity=False, add_vectors=False)
 
-# Quick and easy
-nlp.tagger = Tagger(nlp.vocab, features=Tagger.feature_templates)
+# Quick and easy if you don't have the data installed
+if nlp.tagger is None:
+    nlp.tagger = Tagger(nlp.vocab, features=Tagger.feature_templates)
 
 # Trains our query object
 def train_query(queryObj):
