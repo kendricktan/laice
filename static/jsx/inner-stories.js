@@ -65,6 +65,7 @@ var InnerStoryApp = React.createClass({
         var newAttributeList = this.state.attributeList.filter(function (a) {
             return a.attribute != attributeName;
         });
+        this.setState({attributeList: []});
         this.setState({attributeList: newAttributeList});
     },
 

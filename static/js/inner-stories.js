@@ -20823,6 +20823,7 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
         var newAttributeList = this.state.attributeList.filter(function (a) {
             return a.attribute != attributeName;
         });
+        this.setState({attributeList: []});
         this.setState({attributeList: newAttributeList});
     },
 

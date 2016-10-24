@@ -30,6 +30,7 @@ npm install -g bower
 bower install
 
 pip3 install -r requirements.txt
+python3 -m spacy.en.download –force all
 python3 manage.py runserver
 ```
 

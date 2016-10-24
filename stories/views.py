@@ -1,4 +1,3 @@
-from laice.utils import spacy_ner
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, exceptions, status
@@ -165,7 +164,6 @@ class QueryNERViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
 
         query.parsed_ner = query_ner
         query.save()
-
         # AJAX datatype: json needs a body on 201
         # or else it thinks it failed...
         serializer = self.get_serializer(data=ner)

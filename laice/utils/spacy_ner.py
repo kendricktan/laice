@@ -2,16 +2,25 @@ from __future__ import unicode_literals, print_function
 
 import os
 import random
-from pprint import pprint
 
 import spacy
+
+from spacy.tagger import Tagger
 from django.conf import settings
 from spacy.gold import GoldParse
 from spacy.pipeline import EntityRecognizer
 
+# Load up our Data dir
+# NLP Module
+nlp = spacy.load('en', parser=False, entity=False, add_vectors=False)
+
+# Quick and easy
+nlp.tagger = Tagger(nlp.vocab, features=Tagger.feature_templates)
 
 # Trains our query object
 def train_query(queryObj):
+    global nlp
+
     # Our query string
     story = queryObj.story
     querystring = queryObj.querystring
@@ -20,11 +29,9 @@ def train_query(queryObj):
     # Where our model is located
     model_path = os.path.normpath( os.path.join( settings.SPACYMODEL_DIR, str( story.name ) ) )
 
-    # NLP Module
-    nlp = spacy.load( 'en', parser=False, entity=False, vectors=False )
-
     ENTITY_OFFSETS = []
     ENTITY_LIST = []
+
     for txt in parsed_ner:
         cur_entity = parsed_ner[txt]
         cur_index = querystring.find( txt )
@@ -43,8 +50,6 @@ def train_query(queryObj):
             ENTITY_OFFSETS
         ),
     ]
-
-    pprint(ENTITY_OFFSETS)
 
     # Trains the model
     # loads up existing data if they exist
@@ -68,43 +73,45 @@ def train_query(queryObj):
 
 # Gets our query object
 def get_query(queryObj):
+    global nlp
+
     # Our query string
     story = queryObj.story
     querystring = queryObj.querystring
-    parsed_ner = queryObj.parsed_ner
 
     # Where our model is located
     model_path = os.path.normpath( os.path.join( settings.SPACYMODEL_DIR, str( story.name ) ) )
 
     ENTITY_LIST = []
-    for attribute in story.storyattribute_set.all():
-        ENTITY_LIST.append(str(attribute.attribute))
-
-    print(ENTITY_LIST)
+    for attribute in story.storyattribute_set.all( ):
+        ENTITY_LIST.append( str( attribute.attribute ) )
 
     # Initialize Spacy modules
-    nlp = spacy.load( 'en', parser=False, entity=False, vectors=False )
     ner = EntityRecognizer( nlp.vocab, entity_types=ENTITY_LIST )
 
+    # Only tag ners if there is an existing dataset
     if os.path.isfile( model_path ):
         ner.model.load( model_path )
 
-    # Creates a tagger
-    doc = nlp.make_doc( querystring )
-    nlp.tagger( doc )
-    ner( doc )
+        # Creates a tagger
+        doc = nlp.make_doc( querystring )
 
-    # Formatted Dic, or in JSON format
-    ner_dict = {}
+        nlp.tagger( doc )
+        ner( doc )
 
-    for word in doc:
-        if word.ent_type_ is not None and word.ent_type_ is not '':
-            ner_dict[word.text] = word.ent_type_
+        # Formatted Dic, or in JSON format
+        ner_dict = {}
 
-    pprint( ner_dict )
+        for word in doc:
+            if word.ent_type_ is not None and word.ent_type_ is not '':
+                ner_dict[word.text] = word.ent_type_
 
-    # Save dict as our parsed ner
-    queryObj.parsed_ner = ner_dict
+        # Save dict as our parsed ner
+        queryObj.parsed_ner = ner_dict
+
+    # Returns empty dict
+    else:
+        queryObj.parsed_ner = {}
 
 
 # Cleans our query object (on deletion)

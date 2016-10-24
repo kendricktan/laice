@@ -52,7 +52,7 @@ class StoryAttribute(models.Model):
         # Check if story has similar name
         if self.story:
             # If something exists
-            if StoryAttribute.objects.filter(attribute=self.attribute):
+            if StoryAttribute.objects.filter(attribute=self.attribute, story=self.story):
                 raise exceptions.ValidationError(detail={'attribute': 'story already has an attribute of the same name'})
 
     def save(self, *args, **kwargs):
