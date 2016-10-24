@@ -18,6 +18,12 @@ Laice can also communicate with your applications through a RESTful API.
 
 In other words, laice aims to be a free, open sourced alternative to  <a href="http://wit.ai">api.ai</a>, <a href="http://wit.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a>
 
+Laice turns words into meanings (with enough training data), for example:
+
+- `Jack lives in Berlin` -> `{'person': 'Jack', 'location': 'Berlin'}`
+- `Tutu really likes bananas` -> `{'person': 'Tutu', 'food': 'bananas'}`
+- `Close the door` -> `{'action': 'close', 'object': 'door'}`
+
 ---
  
 ## Getting started
@@ -35,12 +41,8 @@ pip3 install -r requirements.txt
 # predictions, however will have a slower startup
 # time. Its downloading pre-processed data.
 python3 -m spacy.en.download –force all 
-
-python3 manage.py runserver
-```
-If you get an error on first time run, you may need to issue the following command: 
-```
 python3 manage.py migrate
+python3 manage.py runserver
 ```
 
 Then navigate to `http://127.0.0.1:8000` to view your own Natural Language Processor!
