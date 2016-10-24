@@ -13,13 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.conf.urls import url, include
+from django.conf.urls.static import static
 from django.contrib import admin
 
+from laice import views
+
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('api.urls')),
-    url(r'^stories/', include('stories.urls')),
-    url(r'^help/', include('help.urls')),
-    url(r'^', include('dashboard.urls')),
-]
+  url( r'^admin/', admin.site.urls ),
+  url( r'^api/', include( 'api.urls' ) ),
+  url( r'^stories/', include( 'stories.urls' ) ),
+  url( r'^help/', views.help_view, name='help_view' ),
+  url( r'^about/', views.about_view, name='about_view' ),
+  url( r'^', include( 'dashboard.urls' ) ),
+] + static( settings.STATIC_URL, document_root=settings.STATIC_ROOT )

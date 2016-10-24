@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     # Our apps
     'api',
     'dashboard',
-    'help',
     'stories',
 
     # DRF
