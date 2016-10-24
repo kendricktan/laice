@@ -21169,7 +21169,7 @@ var QueryList = React.createClass({displayName: "QueryList",
                         ), 
 
 
-                        React.createElement(QueryNERList, {attributeList: this.props.attributeList, nerDict: nerDict, queryId: query.id})
+                        React.createElement(QueryNERList, {querystring: query.querystring, attributeList: this.props.attributeList, nerDict: nerDict, queryId: query.id})
 
                     )
                 )
@@ -21255,7 +21255,7 @@ var QueryNERList = React.createClass({displayName: "QueryNERList",
         return (
             React.createElement("tbody", null, 
             ners, 
-            React.createElement(QueryNewNER, {onNERCreate: this.onNERCreate, attributeList: this.props.attributeList})
+            React.createElement(QueryNewNER, {querystring: this.props.querystring, onNERCreate: this.onNERCreate, attributeList: this.props.attributeList})
             )
         )
     }
@@ -21298,6 +21298,10 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
         this.setState({targetAttribute: val});
     },
 
+    onNERSelectTargetText: function(val){
+        this.setState({targetText: val});
+    },
+
     onNERSubmit: function () {
         if (this.state.targetText != "" && this.state.targetAttribute != "") {
             this.setState({labelText: "", labelAttribute: ""});
@@ -21322,9 +21326,10 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
         return (
             React.createElement("tr", null, 
                 React.createElement("th", null, 
-                    React.createElement("input", {type: "text", className: "form-control", placeholder: "text", 
-                           onChange: (e)=>this.setState({targetText: e.target.value}), 
-                           ref: "targetTextInput"}), 
+                    React.createElement(QueryTargetTextSelect, {
+                        handleNERSelectTargetText: this.onNERSelectTargetText, 
+                        querystring: this.props.querystring}
+                    ), 
                     React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText))
                 ), 
                 React.createElement("th", null, 
@@ -21337,6 +21342,26 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
                             onClick: this.onNERSubmit}, "Add"
                     )
                 )
+            )
+        )
+    }
+});
+
+// Query target text
+var QueryTargetTextSelect = React.createClass({displayName: "QueryTargetTextSelect",
+    onSelectChange: function(val){
+        this.props.handleNERSelectTargetText(val);
+    },
+
+    render: function(){
+        return (
+            React.createElement("select", {onChange: (e)=>this.onSelectChange(e.target.value), className: "form-control"}, 
+                React.createElement("option", {selected: true, disabled: true}, "..."), 
+                
+                    this.props.querystring.split(" ").map(function(txt){
+                        return (React.createElement("option", {value: txt}, txt))
+                    }.bind(this))
+                
             )
         )
     }

@@ -411,7 +411,7 @@ var QueryList = React.createClass({
                         </thead>
 
 
-                        <QueryNERList attributeList={this.props.attributeList} nerDict={nerDict} queryId={query.id}/>
+                        <QueryNERList querystring={query.querystring} attributeList={this.props.attributeList} nerDict={nerDict} queryId={query.id}/>
 
                     </table>
                 </div>
@@ -497,7 +497,7 @@ var QueryNERList = React.createClass({
         return (
             <tbody>
             {ners}
-            <QueryNewNER onNERCreate={this.onNERCreate} attributeList={this.props.attributeList}/>
+            <QueryNewNER querystring={this.props.querystring} onNERCreate={this.onNERCreate} attributeList={this.props.attributeList} />
             </tbody>
         )
     }
@@ -540,6 +540,10 @@ var QueryNewNER = React.createClass({
         this.setState({targetAttribute: val});
     },
 
+    onNERSelectTargetText: function(val){
+        this.setState({targetText: val});
+    },
+
     onNERSubmit: function () {
         if (this.state.targetText != "" && this.state.targetAttribute != "") {
             this.setState({labelText: "", labelAttribute: ""});
@@ -564,9 +568,10 @@ var QueryNewNER = React.createClass({
         return (
             <tr>
                 <th>
-                    <input type="text" className="form-control" placeholder="text"
-                           onChange={(e)=>this.setState({targetText: e.target.value})}
-                           ref="targetTextInput"/>
+                    <QueryTargetTextSelect
+                        handleNERSelectTargetText={this.onNERSelectTargetText}
+                        querystring={this.props.querystring}
+                    />
                     <p><span className="label label-warning">{this.state.labelText}</span></p>
                 </th>
                 <th>
@@ -580,6 +585,26 @@ var QueryNewNER = React.createClass({
                     </button>
                 </th>
             </tr>
+        )
+    }
+});
+
+// Query target text
+var QueryTargetTextSelect = React.createClass({
+    onSelectChange: function(val){
+        this.props.handleNERSelectTargetText(val);
+    },
+
+    render: function(){
+        return (
+            <select onChange={(e)=>this.onSelectChange(e.target.value)} className="form-control">
+                <option selected disabled>...</option>
+                {
+                    this.props.querystring.split(" ").map(function(txt){
+                        return (<option value={txt}>{txt}</option>)
+                    }.bind(this))
+                }
+            </select>
         )
     }
 });
