@@ -20774,7 +20774,8 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
                 // parsed_ner <- NER = named entity recognizer
             ],
             nextURL: "",
-            prevURL: ""
+            prevURL: "",
+            queryListViewLabel: "View: all"
         }
     },
 
@@ -20857,6 +20858,55 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
         }.bind(this));
     },
 
+    handleViewAllQueryList: function(e){
+        e.preventDefault();
+        this.setState({
+            queryListViewLabel: "View: all",
+            queryList: []
+
+        });
+        $.get("/api" + URL_PATH + "queries/", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
+
+    handleViewUnconfiguredQueryList: function(e){
+        e.preventDefault();
+        this.setState({
+            queryListViewLabel: "View: all",
+            queryList: []
+
+        });
+
+        $.get("/api" + URL_PATH + "queries/?unconfigured=true", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
+
+    handleViewConfiguredQueryList: function(e){
+        e.preventDefault();
+        this.setState({
+            queryListViewLabel: "View: all",
+            queryList: []
+
+        });
+
+        $.get("/api" + URL_PATH + "queries/?configured=true", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
 
     render: function () {
         var prevButton = (this.state.prevURL != null) ?
@@ -20899,12 +20949,12 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
                     React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown", 
                             "aria-haspopup": "true", 
                             "aria-expanded": "false"}, 
-                        "View: unconfigured ", React.createElement("span", {className: "caret"})
+                        this.state.queryListViewLabel, " ", React.createElement("span", {className: "caret"})
                     ), 
                     React.createElement("ul", {className: "dropdown-menu"}, 
-                        React.createElement("li", null, React.createElement("a", {href: "#"}, "View: unconfigured")), 
-                        React.createElement("li", null, React.createElement("a", {href: "#"}, "View: configured")), 
-                        React.createElement("li", null, React.createElement("a", {href: "#"}, "View: all"))
+                        React.createElement("li", null, React.createElement("a", {onClick: this.handleViewAllQueryList, href: "#"}, "View: all")), 
+                        React.createElement("li", null, React.createElement("a", {onClick: this.handleViewUnconfiguredQueryList, href: "#"}, "View: unconfigured")), 
+                        React.createElement("li", null, React.createElement("a", {onClick: this.handleViewConfiguredQueryList, href: "#"}, "View: configured"))
                     )
                 ), 
 

@@ -111,7 +111,16 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
-        queries = self.get_queries( )
+        queries = self.get_queries()
+
+        # If unconfigured was specified in URL params
+        if self.request.query_params.get('unconfigured', None):
+            queries = queries.filter(configured=False)
+
+        # If configured was specified in the URL params
+        elif self.request.query_params.get('configured', None):
+            queries = queries.filter(configured=True)
+
         page = self.paginate_queryset(queries)
 
         if page is not None:

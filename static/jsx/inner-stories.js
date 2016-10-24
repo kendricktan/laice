@@ -16,7 +16,8 @@ var InnerStoryApp = React.createClass({
                 // parsed_ner <- NER = named entity recognizer
             ],
             nextURL: "",
-            prevURL: ""
+            prevURL: "",
+            queryListViewLabel: "View: all"
         }
     },
 
@@ -99,6 +100,55 @@ var InnerStoryApp = React.createClass({
         }.bind(this));
     },
 
+    handleViewAllQueryList: function(e){
+        e.preventDefault();
+        this.setState({
+            queryListViewLabel: "View: all",
+            queryList: []
+
+        });
+        $.get("/api" + URL_PATH + "queries/", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
+
+    handleViewUnconfiguredQueryList: function(e){
+        e.preventDefault();
+        this.setState({
+            queryListViewLabel: "View: all",
+            queryList: []
+
+        });
+
+        $.get("/api" + URL_PATH + "queries/?unconfigured=true", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
+
+    handleViewConfiguredQueryList: function(e){
+        e.preventDefault();
+        this.setState({
+            queryListViewLabel: "View: all",
+            queryList: []
+
+        });
+
+        $.get("/api" + URL_PATH + "queries/?configured=true", function (response) {
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
+    },
 
     render: function () {
         var prevButton = (this.state.prevURL != null) ?
@@ -141,12 +191,12 @@ var InnerStoryApp = React.createClass({
                     <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true"
                             aria-expanded="false">
-                        View: unconfigured <span className="caret"></span>
+                        {this.state.queryListViewLabel} <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu">
-                        <li><a href="#">View: unconfigured</a></li>
-                        <li><a href="#">View: configured</a></li>
-                        <li><a href="#">View: all</a></li>
+                        <li><a onClick={this.handleViewAllQueryList} href="#">View: all</a></li>
+                        <li><a onClick={this.handleViewUnconfiguredQueryList} href="#">View: unconfigured</a></li>
+                        <li><a onClick={this.handleViewConfiguredQueryList} href="#">View: configured</a></li>
                     </ul>
                 </div>
 
