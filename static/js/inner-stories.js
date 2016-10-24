@@ -20821,7 +20821,6 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
     },
 
     handleAttributeDelete: function (attributeName) {
-        this.setState({attributeList: []});
         var newAttributeList = this.state.attributeList.filter(function (a) {
             return a.attribute != attributeName;
         });
