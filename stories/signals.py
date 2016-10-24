@@ -27,7 +27,3 @@ def parse_ner(sender, instance, *args, **kwargs):
         instance.configured = True
         print('Query updated for ', str(instance))
         spacy_ner.train_query(instance)
-
-@receiver(pre_delete, sender=Story)
-def delete_ner(sender, instance, using, **kwargs):
-    spacy_ner.clean_story(instance)

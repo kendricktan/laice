@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, exceptions, status
 from rest_framework.response import Response
+from laice.utils import spacy_ner
 
 from laice.core.viewsets import ViewMappingMixin
 from stories.models import Story
@@ -35,6 +36,12 @@ class StoryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        story = self.get_object()
+        story.delete()
+        spacy_ner.clean_story(story)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Story Attributes
