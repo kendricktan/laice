@@ -40,7 +40,7 @@ pip3 install -r requirements.txt
 # Optional, doing this will yeild more accurate
 # predictions, however will have a slower startup
 # time. Its downloading pre-processed data.
-python3 -m spacy.en.download –force all 
+python3 -m spacy.en.download --force all 
 python3 manage.py migrate
 python3 manage.py runserver
 ```
