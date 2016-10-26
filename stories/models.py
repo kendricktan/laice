@@ -1,8 +1,8 @@
 from django.db import models
-from django.conf import settings
 from annoying.fields import JSONField
 
 from rest_framework import exceptions
+
 
 # Our story
 class Story(models.Model):
@@ -10,6 +10,8 @@ class Story(models.Model):
         max_length=128,
         unique=True,
     )
+
+    training = models.BooleanField(default=False)
 
     @property
     def unconfigured_requests(self):

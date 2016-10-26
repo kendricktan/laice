@@ -16,6 +16,8 @@ from stories.serializers import (
 )
 from stories.viewsets import GetStoryMixin
 
+import threading, time
+
 
 # Render views
 def stories_view(request):
@@ -42,6 +44,28 @@ class StoryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         story.delete()
         spacy_ner.clean_story(story)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# Story retrain
+class StoryRetrainViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
+    list_methods = ['create', 'list']
+
+    queryset = Story.objects.all()
+    serializer_class = StorySerializer
+
+    # Retrain data at this point
+    def create(self, request, *args, **kwargs):
+        # Start retraining thread
+        story = self.get_object()
+        story.training = True
+        story.save()
+        threading.Thread(target=spacy_ner.retrain_story(story)).start()
+        return Response()
+
+    def list(self, request, *args, **kwargs):
+        story = self.get_object()
+        serializer = self.get_serializer(story)
+        return Response(serializer.data)
 
 
 # Story Attributes
@@ -105,7 +129,7 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         request_data['story'] = self.kwargs[self.first_key]
         serializer = self.input_serializer_class(data=request_data)
         serializer.is_valid(raise_exception=True)
-        serializer.save() # Because we're using signals, there's a callback function for pre_save
+        serializer.save()  # Because we're using signals, there's a callback function for pre_save
         # We therefore need to reload the instance into serializer
         serializer = self.output_serializer_class(serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -141,7 +165,7 @@ class QueryViewSet(GetStoryMixin, ViewMappingMixin, viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_query(self):
-        queries = self.get_queries( )
+        queries = self.get_queries()
         try:
             query = queries.get(pk=self.kwargs[self.second_key])
         except (ObjectDoesNotExist):

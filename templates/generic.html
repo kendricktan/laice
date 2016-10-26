@@ -38,7 +38,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Laice</a>
+            <a class="navbar-brand" href="{% url 'dashboard_view' %}">Laice</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -47,7 +47,6 @@
                 <li class="{% block dashboard_active %}{% endblock %}"><a
                         href="{% url 'dashboard_view' %}">Dashboard</a></li>
                 <li class="{% block stories_active %}{% endblock %}"><a href="{% url 'stories_view' %}">Stories</a></li>
-
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="{% block help_active %}{% endblock %}"><a href="{% url 'help_view' %}">Help</a></li>

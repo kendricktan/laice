@@ -26,7 +26,15 @@ var InnerStoryApp = React.createClass({
             this.setState({attributeList: attributes})
         }.bind(this));
 
+        this.refreshQueries();
+    },
+
+    refreshQueries: function () {
         $.get("/api" + URL_PATH + "queries/", function (response) {
+            this.setState({
+                queryList: [],
+            });
+
             this.setState({
                 queryList: response.results,
                 nextURL: response.next,
@@ -40,12 +48,7 @@ var InnerStoryApp = React.createClass({
             url: "/api" + URL_PATH + "queries/" + queryId,
             type: 'DELETE',
             success: function (response) {
-                var newQueryList = this.state.queryList.filter(function (a) {
-                    return a.id != queryId;
-                });
-                this.setState({queryList: []});
-                this.setState({queryList: newQueryList});
-
+                this.refreshQueries();
             }.bind(this),
             error: function (response) {
                 console.log(response);
@@ -100,7 +103,7 @@ var InnerStoryApp = React.createClass({
         }.bind(this));
     },
 
-    handleViewAllQueryList: function(e){
+    handleViewAllQueryList: function (e) {
         e.preventDefault();
         this.setState({
             queryListViewLabel: "View: all",
@@ -116,7 +119,7 @@ var InnerStoryApp = React.createClass({
         }.bind(this));
     },
 
-    handleViewUnconfiguredQueryList: function(e){
+    handleViewUnconfiguredQueryList: function (e) {
         e.preventDefault();
         this.setState({
             queryListViewLabel: "View: unconfigured",
@@ -133,12 +136,11 @@ var InnerStoryApp = React.createClass({
         }.bind(this));
     },
 
-    handleViewConfiguredQueryList: function(e){
+    handleViewConfiguredQueryList: function (e) {
         e.preventDefault();
         this.setState({
             queryListViewLabel: "View: configured",
             queryList: []
-
         });
 
         $.get("/api" + URL_PATH + "queries/?configured=true", function (response) {
@@ -155,7 +157,8 @@ var InnerStoryApp = React.createClass({
             <button onClick={this.handlePrevPage} type="button" className="btn btn-default">Previous</button> : "";
 
         var nextButton = (this.state.nextURL != null) ?
-            <button onClick={this.handleNextPage} type="button" className="pull-right btn btn-default">Next</button> : "";
+            <button onClick={this.handleNextPage} type="button" className="pull-right btn btn-default">
+                Next</button> : "";
 
         return (
             <div>
@@ -180,7 +183,7 @@ var InnerStoryApp = React.createClass({
 
                 <div className="well">
                     <h2>Manual query</h2>
-                    <ManualQuery onQueryListAdd={this.handleQueryListAdd}/>
+                    <ManualQuery refreshQueries={this.refreshQueries} onQueryListAdd={this.handleQueryListAdd}/>
                 </div>
 
                 <br/>
@@ -221,6 +224,12 @@ var InnerStoryApp = React.createClass({
 
 /* Inner story Header */
 var InnerStoryHeader = React.createClass({
+    getInitialState: function () {
+        return {
+            training: false
+        }
+    },
+
     onDeleteStory: function () {
         $.ajax({
             url: "/api" + URL_PATH,
@@ -234,13 +243,46 @@ var InnerStoryHeader = React.createClass({
         });
     },
 
+    componentDidMount: function () {
+        setInterval(() => {
+            $.get({
+                url: "/api" + URL_PATH + "retrain/",
+                success: function (response) {
+                    this.setState({
+                        training: response.training
+                    })
+                }.bind(this)
+            })
+        }, 10000);
+    },
+
+    handleRetrainModel: function () {
+        $.post({
+            url: "/api" + URL_PATH + "retrain/",
+            success: function (response) {
+                this.setState({
+                    training: true
+                })
+            }.bind(this)
+        });
+    },
+
     render: function () {
+        var retrain_btn = (!this.state.training) ?
+            <button type="button" onClick={this.handleRetrainModel} className="pull-right btn btn-success">Retrain
+                model</button> : <button className="pull-right btn btn-warning">
+            <span className="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Training...</button>;
+
         return (
             <h3>
                 <button type="button" className="pull-right btn btn-danger" data-toggle="modal"
                         data-target="#delete-story-modal">
                     Delete Story
                 </button>
+                <div className="pull-right">
+                    &nbsp;
+                </div>
+                {retrain_btn}
                 <div className="modal fade" id="delete-story-modal" tabIndex="-1" role="dialog"
                      aria-labelledby="myModalLabel">
                     <div className="modal-dialog" role="document">
@@ -430,7 +472,7 @@ var ManualQuery = React.createClass({
             },
             success: function (response) {
                 this.refs.querystringInput.value = "";
-                this.props.onQueryListAdd(response);
+                this.props.refreshQueries();
             }.bind(this),
             error: function (response) {
                 this.props.onAttributeDuplicate();

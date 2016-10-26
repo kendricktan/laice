@@ -6,12 +6,15 @@ from stories.views import (
     StoryViewSet,
     StoryAttributeViewSet,
     QueryViewSet,
-    QueryNERViewSet
+    QueryNERViewSet,
+    StoryRetrainViewSet
 )
 
 urlpatterns = [
     url(r'^stories/$', StoryViewSet.list_mapping(), name='story_list'),
     url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/$', StoryViewSet.detail_mapping(), name='story_detail'),
+
+    url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/retrain/$', StoryRetrainViewSet.list_mapping(), name='story_retrain'),
 
     url(r'^stories/(?P<story_name>[A-Za-z0-9-]+)/attributes/$', StoryAttributeViewSet.list_mapping(),
         name='story_attribute_list'),
