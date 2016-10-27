@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block content %}
+    <div class="well">
+        <h2>Curl request:</h2>
+        <pre>curl -X post -H "Content-Type: application/json" -d '{"querystring": "my querystring"}' http://{{ request.get_host }}{% url 'query_list' story_name=story_name %}</pre>
+    </div>
+
     <div id="div-inner-story-content"></div>
 {% endblock content %}
 

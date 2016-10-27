@@ -68,6 +68,15 @@
         </p>
         <img class="img-responsive center-block" src="https://i.imgur.com/YJvl2If.png"/>
     </div>
+    <div>
+        <h2>6. Passing data through it!</h2>
+        <p>
+            You can now communicate with the server via a RESTful request. To do it with <code>Curl</code> execute:
+            <pre>curl -X post -H "Content-Type: application/json" -d '{"querystring": "Jack is in London"}' http://127.0.0.1:8000/api/stories/my-story-name/queries/</pre>
+            <strong>Note</strong>: You might need to change <code>127.0.0.1:8000</code> to your server domain and <code>my-story-name</code> to your story's name.
+            The <code>curl request</code> is also located at the very top of each of your story.
+        </p>
+    </div>
     <hr/>
     <div>
         <h2>Help! My model isn't working! </h2>
