@@ -6,6 +6,75 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Hello.</h2>
-    1. Get started :)
+    <div>
+        <h2><span class="glyphicon glyphicon-book"></span> &nbsp; Build your first app.</h2><br/>
+        <div class="well">Here you'll learn how to get your first NLP app up and going in the cloud <span
+                class="glyphicon glyphicon-cloud"></span></div>
+        <hr/>
+    </div>
+    <div>
+        <h2>1. Create your first story</h2>
+        <p>
+            In order for Laice to classify the text you sent it, it needs some <i>context</i>. The <i>context</i> needed
+            is stored in a <strong>Story</strong>. <strong>Stories</strong> can be made <a
+                href="{% url 'stories_view' %}">here</a>.
+        </p>
+        <img class="img-responsive center-block" src="https://i.imgur.com/Mcc1ooV.png"/>
+    </div>
+    <div>
+        <h2>2. Establishing attributes</h2>
+        <p>
+            <strong>Attributes</strong> are like <i>features</i> that Laice tries to identify within a sentence.
+            For example, if you have two attributes: <code>name</code>, and <code>location</code> and you send it the
+            sentence:
+            <code>John is in London</code>, Laice will try and associate <code>{'name': 'John', 'location':
+            'London'}</code> Of course this doesn't happen by magic and will require some training before Laice is able
+            to do that, which is what we'll look into next!
+        </p>
+        <img class="img-responsive center-block" src="https://i.imgur.com/UxN0gXd.png"/>
+    </div>
+    <div>
+        <h2>3. Added some examples</h2>
+        <p>
+            Laice isn't powered by black magic and will of course need some examples before it'll be able to
+            automatically recognize attributes on its own. Start by entering some basic query examples for Laice to
+            learn.
+        </p>
+        <img class="img-responsive center-block" src="https://i.imgur.com/Zk6jQKy.png"/>
+    </div>
+    <div>
+        <h2>4. Configuring your examples</h2>
+        <p>
+            Once you have a satisfiable amount of examples (5-10), start configuring where each attributes should
+            belong to in a sentence. You can configure which attributes belong to which part of the sentence via the
+            dropdown box.
+        </p>
+        <img class="img-responsive center-block" src="https://i.imgur.com/0Xpivmn.png"/>
+    </div>
+    <div>
+        <h2>5. Train it!</h2>
+        <p>
+            Now that we have a sufficient list of examples to follow, simply click on the <i>Retrain model</i> button
+            located at the top of your project.
+        </p>
+        <img class="img-responsive center-block" src="https://i.imgur.com/Kq2ezIh.png"/>
+    </div>
+    <div>
+        <h2>6. Test it!</h2>
+        <p>
+            Now simply go back to the <code>manual query</code> part of your story and insert a new sentence. Laice
+            hopefully *fingers crossed* should be able to correctly label the key attributes of the new sentence. If it
+            doesn't work then continue reading below.
+        </p>
+        <img class="img-responsive center-block" src="https://i.imgur.com/YJvl2If.png"/>
+    </div>
+    <hr/>
+    <div>
+        <h2>Help! My model isn't working! </h2>
+        <p>
+            Laice learns by examples, if it isn't able to classify your sentence correctly just reconfigure the sentence
+            it got wrong via the dropdown buttons/delete buttons and hit the <code>retrain</code> button
+        </p>
+    </div>
+
 {% endblock %}
