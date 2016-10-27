@@ -5,6 +5,24 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Hello.</h2>
-    1. Get started :)
+    <h2>Laice. What? Why?</h2>
+    <hr/>
+    <p>
+        Laice allows you to build, train, and classify your own sentences via a Web UI. Laice can also communicate with
+        your
+        applications through a RESTful API.
+    </p>
+
+    <p>
+        In other words, laice aims to be a free, open sourced alternative to api.ai, luis.ai, and wit.ai
+    </p>
+
+    <p>
+        Laice turns words into meanings (with enough training data), for example:
+
+        <p>Jack lives in Berlin -> <code>{'person': 'Jack', 'location': 'Berlin'}</code></p>
+        <p>Tutu really likes bananas -> <code>{'person': 'Tutu', 'food': 'bananas'}</code></p>
+        <p>Close the door -> <code>{'action': 'close', 'object': 'door'}</code></p>
+    </p>
+    <hr/>
 {% endblock %}
