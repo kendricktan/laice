@@ -94,3 +94,6 @@ ENV/
 
 # log files
 nohup.out
+/nbproject/private/
+nbproject/project.xml
+*.properties

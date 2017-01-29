@@ -6,7 +6,7 @@ var ReactDOM = require("react-dom");
 
 /* Inner story main app */
 var InnerStoryApp = React.createClass({
-    getInitialState: function () {
+    getInitialState: function () { 
         return {
             // Contains a list of attributes
             attributeList: [],
@@ -704,7 +704,12 @@ var QueryNewNER = React.createClass({
         return (
             <tr>
                 <th>
-                    <QueryTargetTextSelect
+                {/* 15-Jan-2017 - NAV - Replacing text select to text free form entry */}
+                {/* <QueryTargetTextSelect
+                     handleNERSelectTargetText={this.onNERSelectTargetText}
+                     querystring={this.props.querystring}
+                 /> */}
+                 <QueryTargetTextEnter
                         handleNERSelectTargetText={this.onNERSelectTargetText}
                         querystring={this.props.querystring}
                     />
@@ -741,6 +746,21 @@ var QueryTargetTextSelect = React.createClass({
                     }.bind(this))
                 }
             </select>
+        )
+    }
+});
+
+// 15/Jan/2017 - NAV - Created new class for entering text for Text instead of having to select
+// Query target text free form entry
+var QueryTargetTextEnter = React.createClass({
+    onValueChange: function (val) {
+        console.log('QueryTargetTextEnter onValueChange : ' + val);
+        this.props.handleNERSelectTargetText(val);
+    },
+
+    render: function () {
+        return (
+            <input type="text" onChange={(e)=>this.onValueChange(e.target.value)} ></input>
         )
     }
 });

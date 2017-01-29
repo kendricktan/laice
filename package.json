@@ -1,5 +1,5 @@
 {
-  "name": "laice",
+  "name": "karman",
   "version": "1.0.0",
   "description": "(Frontend) Train your own Natural Language Processor straight from your browser!",
   "main": "",
@@ -13,6 +13,7 @@
     "url": "https://github.com/kendricktan/laice/issues"
   },
   "homepage": "https://github.com/kendricktan/laice#readme",
+  "scripts": { "runserver" : "python ./manage.py runserver", "gulp": "gulp" },
   "dependencies": {
     "babel-plugin-transform-react-jsx": "^6.8.0",
     "bower": "^1.7.9",
