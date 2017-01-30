@@ -1,10 +1,3 @@
-#<p align="center">
-#  <a href="#">
-#    <img alt="karman" src="https://i.imgur.com/HmvI1JP.png" width="128"><br/>    
-#  </a>
-#  <sub>Icon by <a href="http://www.flaticon.com/authors/simpleicon">simpleicons</a></sub>
-#</p>
-
 <p align="center">
     Train your own Natural Language Processor straight from your browser!
 </p>
