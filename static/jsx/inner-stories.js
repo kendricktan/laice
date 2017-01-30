@@ -167,6 +167,13 @@ var InnerStoryApp = React.createClass({
                 </div>
 
                 <br/>
+                
+                <ul className="nav nav-pills nav-justified">
+                    <li className="active"><a href="#">Train</a></li>
+                    <li><a href="see">See</a></li>
+                </ul>
+        
+                <br/>
 
                 <div className="well">
                     <h2>Attributes</h2>
@@ -303,6 +310,8 @@ var InnerStoryHeader = React.createClass({
                 <a href={STORY_URL}>Stories</a>
                 &nbsp; &gt; &nbsp;
                 <a href={STORY_URL + STORY_NAME}>{STORY_NAME}</a>
+                &nbsp; &gt; &nbsp;
+                <a target="_blank" href={API_URL}>api</a>
             </h3>
         )
     }
@@ -485,7 +494,7 @@ var ManualQuery = React.createClass({
             <form onSubmit={this.handleSubmit}>
                 <p>
                     <p><span className="label label-warning">{this.state.labelText}</span></p>
-                    <input ref="querystringInput" type="text" placeholder="'Turn the temperature down by 2 degrees'"
+                    <input ref="querystringInput" type="text" placeholder="'Your text here'"
                            className="form-control"
                            onChange={(e)=>this.setState({querystring: e.target.value})}
                     />
@@ -754,7 +763,6 @@ var QueryTargetTextSelect = React.createClass({
 // Query target text free form entry
 var QueryTargetTextEnter = React.createClass({
     onValueChange: function (val) {
-        console.log('QueryTargetTextEnter onValueChange : ' + val);
         this.props.handleNERSelectTargetText(val);
     },
 

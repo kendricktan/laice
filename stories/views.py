@@ -28,6 +28,9 @@ def inner_story_view(request, story_name):
     inner_story = get_object_or_404(Story, name=story_name)
     return render(request, 'inner-story.html', {'story_name': story_name})
 
+def visualisation_view(request, story_name):
+    visualisation = get_object_or_404(Story, name=story_name)
+    return render(request, 'visualisation.html', {'story_name': story_name})
 
 # Rest framework ViewSets
 # Story

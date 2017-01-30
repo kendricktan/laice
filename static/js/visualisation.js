@@ -20503,16 +20503,8 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
         }
     },
 
-    componentDidMount: function () {
-        $.get("/api" + URL_PATH + "attributes/", function (attributes) {
-            this.setState({attributeList: attributes})
-        }.bind(this));
-
-        this.refreshQueries();
-    },
-
     refreshQueries: function () {
-        $.get("/api" + URL_PATH + "queries/", function (response) {
+        $.get(API_URL + "queries/", function (response) {
             this.setState({
                 queryList: [],
             });
@@ -20523,38 +20515,6 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
                 prevURL: response.previous
             })
         }.bind(this));
-    },
-
-    handleQueryListRemove: function (queryId) {
-        $.ajax({
-            url: "/api" + URL_PATH + "queries/" + queryId,
-            type: 'DELETE',
-            success: function (response) {
-                this.refreshQueries();
-            }.bind(this),
-            error: function (response) {
-                console.log(response);
-            }
-        });
-    },
-
-    handleQueryListAdd: function (query) {
-        // Refresh the entire array
-        // If we just concat one in front then it won't update the attributes
-        var tempQueryList = this.state.queryList;
-        this.setState({queryList: []});
-        this.setState({queryList: [query].concat(tempQueryList)});
-    },
-
-    handleAttributeSubmit: function (attr) {
-        this.setState({attributeList: this.state.attributeList.concat([attr])});
-    },
-
-    handleAttributeDelete: function (attributeName) {
-        var newAttributeList = this.state.attributeList.filter(function (a) {
-            return a.attribute != attributeName;
-        });
-        this.setState({attributeList: newAttributeList});
     },
 
     handleNextPage: function () {
@@ -20585,55 +20545,6 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
         }.bind(this));
     },
 
-    handleViewAllQueryList: function (e) {
-        e.preventDefault();
-        this.setState({
-            queryListViewLabel: "View: all",
-            queryList: []
-
-        });
-        $.get("/api" + URL_PATH + "queries/", function (response) {
-            this.setState({
-                queryList: response.results,
-                nextURL: response.next,
-                prevURL: response.previous
-            })
-        }.bind(this));
-    },
-
-    handleViewUnconfiguredQueryList: function (e) {
-        e.preventDefault();
-        this.setState({
-            queryListViewLabel: "View: unconfigured",
-            queryList: []
-
-        });
-
-        $.get("/api" + URL_PATH + "queries/?unconfigured=true", function (response) {
-            this.setState({
-                queryList: response.results,
-                nextURL: response.next,
-                prevURL: response.previous
-            })
-        }.bind(this));
-    },
-
-    handleViewConfiguredQueryList: function (e) {
-        e.preventDefault();
-        this.setState({
-            queryListViewLabel: "View: configured",
-            queryList: []
-        });
-
-        $.get("/api" + URL_PATH + "queries/?configured=true", function (response) {
-            this.setState({
-                queryList: response.results,
-                nextURL: response.next,
-                prevURL: response.previous
-            })
-        }.bind(this));
-    },
-
     render: function () {
         var prevButton = (this.state.prevURL != null) ?
             React.createElement("button", {onClick: this.handlePrevPage, type: "button", className: "btn btn-default"}, "Previous") : "";
@@ -20651,61 +20562,17 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
                 React.createElement("br", null), 
                 
                 React.createElement("ul", {className: "nav nav-pills nav-justified"}, 
-                    React.createElement("li", {className: "active"}, React.createElement("a", {href: "#"}, "Train")), 
-                    React.createElement("li", null, React.createElement("a", {href: "see"}, "See"))
+                    React.createElement("li", {className: "inactive"}, React.createElement("a", {href: STORY_URL + STORY_NAME}, "Train")), 
+                    React.createElement("li", {className: "active"}, React.createElement("a", {href: "see"}, "See"))
                 ), 
         
                 React.createElement("br", null), 
 
                 React.createElement("div", {className: "well"}, 
-                    React.createElement("h2", null, "Attributes"), 
-                    React.createElement(AttributeApp, {
-                        attributeList: this.state.attributeList, 
-                        onAttributeSubmit: this.handleAttributeSubmit, 
-                        onAttributeDelete: this.handleAttributeDelete}
-                    )
-                ), 
-
-                React.createElement("br", null), 
-                React.createElement("hr", null), 
-                React.createElement("br", null), 
-
-                React.createElement("div", {className: "well"}, 
-                    React.createElement("h2", null, "Manual query"), 
                     React.createElement(ManualQuery, {refreshQueries: this.refreshQueries, onQueryListAdd: this.handleQueryListAdd})
                 ), 
-
-                React.createElement("br", null), 
-                React.createElement("hr", null), 
-                React.createElement("br", null), 
-
-                React.createElement("div", {className: "pull-right btn-group"}, 
-                    React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown", 
-                            "aria-haspopup": "true", 
-                            "aria-expanded": "false"}, 
-                        this.state.queryListViewLabel, " ", React.createElement("span", {className: "caret"})
-                    ), 
-                    React.createElement("ul", {className: "dropdown-menu"}, 
-                        React.createElement("li", null, React.createElement("a", {onClick: this.handleViewAllQueryList, href: "#"}, "View: all")), 
-                        React.createElement("li", null, React.createElement("a", {onClick: this.handleViewUnconfiguredQueryList, href: "#"}, "View: unconfigured")), 
-                        React.createElement("li", null, React.createElement("a", {onClick: this.handleViewConfiguredQueryList, href: "#"}, "View: configured"))
-                    )
-                ), 
-
-                React.createElement("br", null), 
-                React.createElement("br", null), 
-                React.createElement("br", null), 
-
-                React.createElement(QueryApp, {
-                    attributeList: this.state.attributeList, 
-                    queryList: this.state.queryList, 
-                    onQueryListRemove: this.handleQueryListRemove}
-                ), 
-
-                React.createElement("hr", null), 
-
-                prevButton, 
-                nextButton
+        
+                React.createElement("br", null)
             )
         )
     }
@@ -20721,7 +20588,7 @@ var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
 
     onDeleteStory: function () {
         $.ajax({
-            url: "/api" + URL_PATH,
+            url: API_URL,
             type: 'DELETE',
             success: function (response) {
                 window.location.replace(DOMAIN + STORY_URL);
@@ -20735,7 +20602,7 @@ var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
     componentDidMount: function () {
         setInterval(() => {
             $.get({
-                url: "/api" + URL_PATH + "retrain/",
+                url: API_URL + "retrain/",
                 success: function (response) {
                     this.setState({
                         training: response.training
@@ -20747,7 +20614,7 @@ var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
 
     handleRetrainModel: function () {
         $.post({
-            url: "/api" + URL_PATH + "retrain/",
+            url: API_URL + "retrain/",
             success: function (response) {
                 this.setState({
                     training: true
@@ -20799,144 +20666,6 @@ var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
     }
 });
 
-/* Attributes */
-var AttributeApp = React.createClass({displayName: "AttributeApp",
-    getInitialState: function () {
-        return {
-            labelText: ""
-        };
-    },
-
-    handleAttributeSubmit: function (attr) {
-        this.setState({labelText: ""});
-        this.props.onAttributeSubmit(attr);
-    },
-
-    handleAttributeRemove: function (attributeName) {
-        this.props.onAttributeDelete(attributeName);
-    },
-
-    handleAttributeDuplicate: function () {
-        this.setState({labelText: "Attribute name already exists!"});
-    },
-
-    render: function () {
-        return (
-            React.createElement("div", null, 
-                React.createElement("table", {className: "table"}, 
-                    React.createElement("thead", null, 
-                    React.createElement("tr", null, 
-                        React.createElement("th", null, "Attribute"), 
-                        React.createElement("th", null, "Action")
-                    )
-                    ), 
-                    React.createElement(AttributeList, {attributeList: this.props.attributeList, 
-                                   onAttributeRemove: this.handleAttributeRemove})
-                ), 
-                React.createElement("hr", null), 
-                React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
-                React.createElement(NewAttribute, {onAttributeDuplicate: this.handleAttributeDuplicate, 
-                              onAttributeSubmit: this.handleAttributeSubmit})
-            )
-        );
-    }
-});
-
-var AttributeList = React.createClass({displayName: "AttributeList",
-    handleAttributeRemove: function (attributeName) {
-        $.ajax({
-            url: "/api" + URL_PATH + "attributes/" + attributeName,
-            type: 'DELETE',
-            success: function (response) {
-                this.props.onAttributeRemove(attributeName);
-            }.bind(this),
-            error: function (response) {
-                console.log(response);
-            }
-        });
-    },
-
-    render: function () {
-        var attributes = [];
-        this.props.attributeList.map(function (attribute) {
-            attributes.push(React.createElement(Attribute, {attributeName: attribute.attribute, 
-                                       onAttributeDelete: this.handleAttributeRemove}));
-        }.bind(this));
-        return (
-            React.createElement("tbody", null, 
-             attributes 
-            )
-        );
-    }
-});
-
-var Attribute = React.createClass({displayName: "Attribute",
-    handleAttributeRemove: function (attributeName) {
-        this.props.onAttributeDelete(this.props.attributeName);
-    },
-
-    render: function () {
-        return (
-            React.createElement("tr", null, 
-                React.createElement("td", null,  this.props.attributeName), 
-                React.createElement("td", null, 
-                    React.createElement("button", {type: "button", className: "btn btn-danger", 
-                            onClick: this.handleAttributeRemove}, 
-                        "Delete"
-                    )
-                )
-            )
-        );
-    }
-});
-
-var NewAttribute = React.createClass({displayName: "NewAttribute",
-    handleSubmit: function (e) {
-        e.preventDefault();
-
-        if (this.state.attribute == null || this.state.attribute == "") {
-            this.setState({labelText: "Attribute can\'t be empty!"});
-            return;
-        }
-
-        this.setState({labelText: ""});
-
-        $.ajax({
-            url: "/api" + URL_PATH + "attributes/",
-            type: "POST",
-            data: {
-                attribute: this.state.attribute
-            },
-            success: function (response) {
-                this.props.onAttributeSubmit(response);
-                this.refs.attributeInput.value = "";
-            }.bind(this),
-            error: function (response) {
-                this.props.onAttributeDuplicate();
-            }.bind(this)
-        });
-    },
-
-    getInitialState: function () {
-        return {
-            attribute: "",
-            labelText: ""
-        };
-    },
-
-    render: function () {
-        return (
-            React.createElement("form", {onSubmit: this.handleSubmit}, 
-                React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
-                React.createElement("input", {ref: "attributeInput", name: "attribute", type: "text", className: "form-control", 
-                       placeholder: "Story name (whitespaces will be trimed, special characters will be replaced with '-')", 
-                       onChange: (e)=>this.setState({attribute: e.target.value})}), React.createElement("br", null), 
-                React.createElement("button", {id: "add-story-btn", type: "submit", className: "btn btn-block btn-default btn-success"}, "Add")
-            )
-        );
-    }
-});
-
 /* Manual query */
 var ManualQuery = React.createClass({displayName: "ManualQuery",
     getInitialState: function () {
@@ -20956,22 +20685,47 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
         this.setState({labelText: ""});
 
         $.ajax({
-            url: "/api" + URL_PATH + "queries/",
+            url: API_URL + "queries/",
             type: "POST",
             data: {
                 querystring: this.state.querystring
             },
             success: function (response) {
+                this.entitystring = this.state.querystring;
+                this.parsed_ner = response.parsed_ner;
                 this.refs.querystringInput.value = "";
                 this.props.refreshQueries();
-            }.bind(this),
-            error: function (response) {
-                this.props.onAttributeDuplicate();
             }.bind(this)
         });
     },
+    
+    mapAlternate: function(str, frag, fn1, fn2, thisArg) {        
+        if(str) {
+        var array = str.split(/(\bmoo\b)/gi);
+        var fn = fn1, output = [];
+        for (var i=0; i<array.length; i++){
+          output[i] = fn.call(thisArg, array[i], i, array);
+          // toggle between the two functions
+          fn = fn === fn1 ? fn2 : fn1;
+        }}
+        return output;
+    },
+    
+    strReplaceAll: function(str, search, replacement) {
+        var target = str;
+        return target.replace(new RegExp(search, 'gi'), replacement);
+    },
+    
+    markText: function(str, parsed_ner) {
+        if(str && parsed_ner){
+            for (var item in parsed_ner)
+                str = this.strReplaceAll(' ' + str + ' ', ' ' + item + ' ', ' <mark data-entity="' + parsed_ner[item] + '">' + item + ' </mark> ');  
+        }
+        return str;
+    },
 
-    render: function () {
+    render: function () {        
+        var children = this.markText(this.entitystring, this.parsed_ner);
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
                 React.createElement("p", null, 
@@ -20981,301 +20735,15 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
                            onChange: (e)=>this.setState({querystring: e.target.value})}
                     )
                 ), 
-                React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Query")
+                React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Query"), 
+                React.createElement("h4", null, React.createElement("div", {dangerouslySetInnerHTML: {__html: children}}))
             )
         );
-    }
-});
-
-/* View queries */
-var QueryApp = React.createClass({displayName: "QueryApp",
-    handleQueryListRemove: function (queryId) {
-        this.props.onQueryListRemove(queryId);
-    },
-
-    render: function () {
-        return (
-            React.createElement("div", null, 
-                React.createElement(QueryList, {
-                    handleQueryListRemove: this.handleQueryListRemove, 
-                    queryList: this.props.queryList, 
-                    attributeList: this.props.attributeList}
-                )
-            )
-        );
-    }
-});
-
-var QueryList = React.createClass({displayName: "QueryList",
-    onQueryListDelete: function (queryId) {
-        this.props.handleQueryListRemove(queryId);
-    },
-
-    render: function () {
-        var queries = [];
-        this.props.queryList.map(function (query) {
-            var gylClass = query.configured ? "glyphicon glyphicon-ok" : "glyphicon glyphicon-remove";
-            var nerDict = query.parsed_ner ? query.parsed_ner : {};
-            queries.push(
-                React.createElement("div", {className: "well"}, 
-                    React.createElement("h4", null, 
-                        React.createElement("button", {onClick: ()=>this.onQueryListDelete(query.id), type: "submit", 
-                                className: "pull-right btn btn-default btn-danger"}, "Delete"
-                        ), 
-                        React.createElement("span", {className: gylClass}), "  ", query.querystring), 
-
-                    React.createElement("hr", null), 
-
-                    React.createElement("table", {className: "table"}, 
-                        React.createElement("thead", null, 
-                        React.createElement("tr", null, 
-                            React.createElement("th", null, "Text"), 
-                            React.createElement("th", null, "Attribute"), 
-                            React.createElement("th", null, "Action")
-                        )
-                        ), 
-
-
-                        React.createElement(QueryNERList, {querystring: query.querystring, attributeList: this.props.attributeList, 
-                                      nerDict: nerDict, queryId: query.id})
-
-                    )
-                )
-            );
-        }.bind(this));
-        return (
-            React.createElement("div", null, 
-                queries
-            )
-        )
-    }
-});
-
-// Query NER List
-var QueryNERList = React.createClass({displayName: "QueryNERList",
-    getInitialState: function () {
-        return {
-            nerDict: this.props.nerDict
-        }
-    },
-
-    onNERDelete: function (NERText) {
-        // Only way to get the key to the hashmap/json
-        // to be obtained from variable name
-        var ner = {};
-        ner[NERText] = true;
-
-        $.ajax({
-            url: "/api" + URL_PATH + "queries/" + this.props.queryId + '/ner/',
-            type: 'DELETE',
-            contentType: "application/json",
-            dataType: "json",
-            data: JSON.stringify({
-                ner
-            }),
-            success: function (response) {
-                var newNerDict = this.state.nerDict;
-                delete newNerDict[NERText];
-                this.setState({nerDict: newNerDict});
-            }.bind(this),
-            error: function (response) {
-                console.log(response);
-            }
-        });
-    },
-
-    onNERCreate: function (targetText, targetAttribute) {
-        var ner = {};
-        ner[targetText] = targetAttribute;
-
-        $.ajax({
-            url: "/api" + URL_PATH + "queries/" + this.props.queryId + '/ner/',
-            type: 'POST',
-            contentType: "application/json",
-            dataType: "json",
-            data: JSON.stringify({
-                ner
-            }),
-            success: function (response) {
-                var newNerDict = this.state.nerDict;
-                newNerDict[targetText] = targetAttribute;
-                this.setState({newDict: newNerDict});
-            }.bind(this),
-            error: function (response) {
-                console.log(response);
-            }
-        })
-    },
-
-    render: function () {
-        var ners = [];
-        for (var key in this.state.nerDict) {
-            // Key is the text
-            // dict[key] contains the attribute
-            // this is so that key cannot be duplicated
-            if (this.state.nerDict.hasOwnProperty(key)) {
-                var tAttr = this.state.nerDict[key];
-                ners.push(
-                    React.createElement(QueryNER, {onNERDelete: this.onNERDelete, targetText: key, targetAttribute: tAttr})
-                )
-            }
-        }
-        return (
-            React.createElement("tbody", null, 
-            ners, 
-            React.createElement(QueryNewNER, {querystring: this.props.querystring, onNERCreate: this.onNERCreate, 
-                         attributeList: this.props.attributeList})
-            )
-        )
-    }
-});
-
-// Query Name Entity Recognizer
-var QueryNER = React.createClass({displayName: "QueryNER",
-    onNERRemove: function (NERText) {
-        this.props.onNERDelete(NERText);
-    },
-
-    render: function () {
-        return (
-            React.createElement("tr", null, 
-                React.createElement("td", {scope: "row"},  this.props.targetText), 
-                React.createElement("td", null,  this.props.targetAttribute), 
-                React.createElement("td", null, 
-                    React.createElement("button", {type: "button", className: "btn btn-danger", 
-                            onClick: (e)=>this.onNERRemove(this.props.targetText)}, 
-                        "Delete"
-                    )
-                )
-            )
-        )
-    }
-});
-
-// New NER
-var QueryNewNER = React.createClass({displayName: "QueryNewNER",
-    getInitialState(){
-        return {
-            targetAttribute: "",
-            targetText: "",
-            labelText: "",
-            labelAttribute: ""
-        }
-    },
-
-    onNERSelectAttribute: function (val) {
-        this.setState({targetAttribute: val});
-    },
-
-    onNERSelectTargetText: function (val) {
-        this.setState({targetText: val});
-    },
-
-    onNERSubmit: function () {
-        if (this.state.targetText != "" && this.state.targetAttribute != "") {
-            this.setState({labelText: "", labelAttribute: ""});
-            this.props.onNERCreate(this.state.targetText, this.state.targetAttribute);
-            return;
-        }
-
-        if (this.state.targetText == "") {
-            this.setState({labelText: "Your text can\'t be null"});
-        } else {
-            this.setState({labelText: ""});
-        }
-
-        if (this.state.labelAttribute == "") {
-            this.setState({labelAttribute: "Your attribute can\'t be null"});
-        } else {
-            this.setState({labelAttribute: ""});
-        }
-    },
-
-    render: function () {
-        return (
-            React.createElement("tr", null, 
-                React.createElement("th", null, 
-                /* 15-Jan-2017 - NAV - Replacing text select to text free form entry */
-                /* <QueryTargetTextSelect
-                     handleNERSelectTargetText={this.onNERSelectTargetText}
-                     querystring={this.props.querystring}
-                 /> */
-                 React.createElement(QueryTargetTextEnter, {
-                        handleNERSelectTargetText: this.onNERSelectTargetText, 
-                        querystring: this.props.querystring}
-                    ), 
-                    React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText))
-                ), 
-                React.createElement("th", null, 
-                    React.createElement(QueryAttributeSelect, {handleNERSelectAttribute: this.onNERSelectAttribute, 
-                                          attributeList: this.props.attributeList}), 
-                    React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelAttribute))
-                ), 
-                React.createElement("th", null, 
-                    React.createElement("button", {type: "button", className: "btn btn-success", 
-                            onClick: this.onNERSubmit}, "Add"
-                    )
-                )
-            )
-        )
-    }
-});
-
-// Query target text
-var QueryTargetTextSelect = React.createClass({displayName: "QueryTargetTextSelect",
-    onSelectChange: function (val) {
-        this.props.handleNERSelectTargetText(val);
-    },
-
-    render: function () {
-        return (
-            React.createElement("select", {onChange: (e)=>this.onSelectChange(e.target.value), className: "form-control"}, 
-                React.createElement("option", {selected: true, disabled: true}, "..."), 
-                
-                    this.props.querystring.split(" ").map(function (txt) {
-                        return (React.createElement("option", {value: txt}, txt))
-                    }.bind(this))
-                
-            )
-        )
-    }
-});
-
-// 15/Jan/2017 - NAV - Created new class for entering text for Text instead of having to select
-// Query target text free form entry
-var QueryTargetTextEnter = React.createClass({displayName: "QueryTargetTextEnter",
-    onValueChange: function (val) {
-        this.props.handleNERSelectTargetText(val);
-    },
-
-    render: function () {
-        return (
-            React.createElement("input", {type: "text", onChange: (e)=>this.onValueChange(e.target.value)})
-        )
-    }
-});
-
-// Select combo-box for queries
-var QueryAttributeSelect = React.createClass({displayName: "QueryAttributeSelect",
-    onSelectChange: function (val) {
-        this.props.handleNERSelectAttribute(val);
-    },
-
-    render: function () {
-        return (
-            React.createElement("select", {onChange: (e)=>this.onSelectChange(e.target.value), className: "form-control"}, 
-                React.createElement("option", {selected: true, disabled: true}, "..."), 
-                
-                    this.props.attributeList.map(function (attribute) {
-                        return (React.createElement("option", {value: attribute.attribute}, attribute.attribute))
-                    }.bind(this))
-                
-            )
-        )
     }
 });
 
 ReactDOM.render(
-    React.createElement(InnerStoryApp, null), document.getElementById('div-inner-story-content')
+    React.createElement(InnerStoryApp, null), document.getElementById('div-visualisation-content')
 );
+
 },{"react":177,"react-dom":26}]},{},[178]);
