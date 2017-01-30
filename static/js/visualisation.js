@@ -20481,124 +20481,272 @@ module.exports = require('./lib/React');
 
 },{"./lib/React":155}],178:[function(require,module,exports){
 /**
- * Created by kendricktan on 21/10/16.
+ * Created by kendricktan on 22/10/16.
  */
-var React = require('react');
-var ReactDOM = require('react-dom');
+var React = require("react");
+var ReactDOM = require("react-dom");
 
-var StoryApp = React.createClass({displayName: "StoryApp",
-    getInitialState: function () {
+/* Inner story main app */
+var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
+    getInitialState: function () { 
         return {
-            stories: [],
-            labelText: ""
-        };
+            // Contains a list of attributes
+            attributeList: [],
+            queryList: [
+                // querystring
+                // configured
+                // parsed_ner <- NER = named entity recognizer
+            ],
+            nextURL: "",
+            prevURL: "",
+            queryListViewLabel: "View: all"
+        }
     },
 
-    componentDidMount: function () {
-        this.serverRequest = $.get('/api' + URL_PATH, function (stories) {
-            this.setState({stories: stories});
+    refreshQueries: function () {
+        $.get(API_URL + "queries/", function (response) {
+            this.setState({
+                queryList: [],
+            });
+
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
         }.bind(this));
     },
 
-    componentWillUnmount: function () {
-        this.serverRequest.abort();
+    handleNextPage: function () {
+        $.get(this.state.nextURL, function (response) {
+            this.setState({
+                queryList: [],
+            });
+
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
     },
 
-    handleStoryAdd: function (story) {
-        this.setState({labelText: ""});
-        this.setState({stories: this.state.stories.concat([story])});
-    },
+    handlePrevPage: function () {
+        $.get(this.state.prevURL, function (response) {
+            this.setState({
+                queryList: [],
+            });
 
-    handleStoryDuplicate: function(){
-        this.setState({labelText: "Story name already exists!"});
+            this.setState({
+                queryList: response.results,
+                nextURL: response.next,
+                prevURL: response.previous
+            })
+        }.bind(this));
     },
 
     render: function () {
+        var prevButton = (this.state.prevURL != null) ?
+            React.createElement("button", {onClick: this.handlePrevPage, type: "button", className: "btn btn-default"}, "Previous") : "";
+
+        var nextButton = (this.state.nextURL != null) ?
+            React.createElement("button", {onClick: this.handleNextPage, type: "button", className: "pull-right btn btn-default"}, 
+                "Next") : "";
+
         return (
             React.createElement("div", null, 
-                React.createElement("table", {id: "stories-table", className: "table"}, 
-                    React.createElement("thead", null, 
-                    React.createElement("tr", null, 
-                        React.createElement("th", null, "Story"), 
-                        React.createElement("th", null, "Unconfigured requests")
-                    )
-                    ), 
-
-                    React.createElement(StoryList, {stories: this.state.stories})
+                React.createElement("div", {className: "well"}, 
+                    React.createElement(InnerStoryHeader, null)
                 ), 
-                React.createElement("hr", null), 
-                React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
-                React.createElement(AddStory, {onDuplicateStory: this.handleStoryDuplicate, onAddStory: this.handleStoryAdd})
+
+                React.createElement("br", null), 
+                
+                React.createElement("ul", {className: "nav nav-pills nav-justified"}, 
+                    React.createElement("li", {className: "inactive"}, React.createElement("a", {href: STORY_URL + STORY_NAME}, "Train")), 
+                    React.createElement("li", {className: "active"}, React.createElement("a", {href: "see"}, "See"))
+                ), 
+        
+                React.createElement("br", null), 
+
+                React.createElement(ManualQuery, {refreshQueries: this.refreshQueries, onQueryListAdd: this.handleQueryListAdd}), 
+        
+                React.createElement("br", null)
             )
         )
     }
 });
 
-var StoryList = React.createClass({displayName: "StoryList",
-    render: function () {
-        var stories = [];
-        this.props.stories.map(function(story){
-            stories.push(React.createElement(Story, {storyName: story.name, storyUnconfiguredCount: story.unconfigured_requests}))
-        }.bind(this));
-        return (
-            React.createElement("tbody", null, 
-             stories 
-            )
-        )
-    }
-});
+/* Inner story Header */
+var InnerStoryHeader = React.createClass({displayName: "InnerStoryHeader",
+    getInitialState: function () {
+        return {
+            training: false
+        }
+    },
 
-var Story = React.createClass({displayName: "Story",
-   render: function(){
-       return(
-           React.createElement("tr", null, 
-               React.createElement("td", null, React.createElement("a", {href:  this.props.storyName},  this.props.storyName)), 
-               React.createElement("td", null,  this.props.storyUnconfiguredCount)
-           )
-       );
-   }
-});
-
-var AddStory = React.createClass({displayName: "AddStory",
-    handleSubmit: function (e) {
-        e.preventDefault();
-
+    onDeleteStory: function () {
         $.ajax({
-            url: "/api" + URL_PATH,
-            type: "POST",
-            data: {
-                name: this.state.name
-            },
+            url: API_URL,
+            type: 'DELETE',
             success: function (response) {
-                this.props.onAddStory(response);
-                this.refs.nameInput.value = "";
+                window.location.replace(DOMAIN + STORY_URL);
             }.bind(this),
             error: function (response) {
-                this.props.onDuplicateStory();
-            }.bind(this),
+                console.log(response);
+            }
         });
     },
 
-    getInitialState: function () {
-        return {
-            name: ""
-        };
+    componentDidMount: function () {
+        setInterval(() => {
+            $.get({
+                url: API_URL + "retrain/",
+                success: function (response) {
+                    this.setState({
+                        training: response.training
+                    })
+                }.bind(this)
+            })
+        }, 10000);
+    },
+
+    handleRetrainModel: function () {
+        $.post({
+            url: API_URL + "retrain/",
+            success: function (response) {
+                this.setState({
+                    training: true
+                })
+            }.bind(this)
+        });
     },
 
     render: function () {
+        var retrain_btn = (!this.state.training) ?
+            React.createElement("button", {type: "button", onClick: this.handleRetrainModel, className: "pull-right btn btn-success"}, "Retrain" + ' ' +
+                "model") : React.createElement("button", {className: "pull-right btn btn-warning"}, 
+            React.createElement("span", {className: "glyphicon glyphicon-refresh glyphicon-refresh-animate"}), " Training...");
+
+        return (
+            React.createElement("h3", null, 
+                React.createElement("button", {type: "button", className: "pull-right btn btn-danger", "data-toggle": "modal", 
+                        "data-target": "#delete-story-modal"}, 
+                    "Delete Story"
+                ), 
+                React.createElement("div", {className: "pull-right"}, 
+                    " "
+                ), 
+                retrain_btn, 
+                React.createElement("div", {className: "modal fade", id: "delete-story-modal", tabIndex: "-1", role: "dialog", 
+                     "aria-labelledby": "myModalLabel"}, 
+                    React.createElement("div", {className: "modal-dialog", role: "document"}, 
+                        React.createElement("div", {className: "modal-content"}, 
+                            React.createElement("div", {className: "modal-header"}, 
+                                React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, React.createElement("span", {
+                                    "aria-hidden": "true"}, "×")), 
+                                React.createElement("h4", {className: "modal-title", id: "myModalLabel"}, "Delete story?")
+                            ), 
+                            React.createElement("div", {className: "modal-footer"}, 
+                                React.createElement("button", {type: "button", className: "btn btn-primary", "data-dismiss": "modal"}, "Close"), 
+                                React.createElement("button", {type: "button", className: "btn btn-danger", onClick: this.onDeleteStory}, "Delete"
+                                )
+                            )
+                        )
+                    )
+                ), 
+                React.createElement("a", {href: STORY_URL}, "Stories"), 
+                "  >  ", 
+                React.createElement("a", {href: STORY_URL + STORY_NAME}, STORY_NAME), 
+                "  >  ", 
+                React.createElement("a", {target: "_blank", href: API_URL}, "api")
+            )
+        )
+    }
+});
+
+/* Manual query */
+var ManualQuery = React.createClass({displayName: "ManualQuery",
+    getInitialState: function () {
+        return {
+            labelText: ""
+        }
+    },
+
+    handleSubmit: function (e) {
+        e.preventDefault();
+
+        if (this.state.querystring == null || this.state.querystring == "") {
+            this.setState({labelText: "Querystring can\'t be null"});
+            return;
+        }
+
+        this.setState({labelText: ""});
+
+        $.ajax({
+            url: API_URL + "queries/",
+            type: "POST",
+            data: {
+                querystring: this.state.querystring
+            },
+            success: function (response) {
+                this.entitystring = this.state.querystring;
+                this.parsed_ner = response.parsed_ner;
+                this.refs.querystringInput.value = "";
+                this.props.refreshQueries();
+            }.bind(this)
+        });
+    },
+    
+    mapAlternate: function(str, frag, fn1, fn2, thisArg) {        
+        if(str) {
+        var array = str.split(/(\bmoo\b)/gi);
+        var fn = fn1, output = [];
+        for (var i=0; i<array.length; i++){
+          output[i] = fn.call(thisArg, array[i], i, array);
+          // toggle between the two functions
+          fn = fn === fn1 ? fn2 : fn1;
+        }}
+        return output;
+    },
+    
+    strReplaceAll: function(str, search, replacement) {
+        var target = str;
+        return target.replace(new RegExp(search, 'gi'), replacement);
+    },
+    
+    markText: function(str, parsed_ner) {
+        if(str && parsed_ner){
+            for (var item in parsed_ner)
+                str = this.strReplaceAll(' ' + str + ' ', ' ' + item + ' ', ' <mark data-entity="' + parsed_ner[item] + '">' + item + '</mark> ');  
+        }
+        return str;
+    },
+
+    render: function () {        
+        var children = this.markText(this.entitystring, this.parsed_ner);
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
-                React.createElement("input", {ref: "nameInput", name: "name", type: "text", className: "form-control", 
-                       placeholder: "Story name (whitespaces will be trimed, special characters will be replaced with '-')", 
-                       onChange: (e)=>this.setState({name: e.target.value})}), React.createElement("br", null), 
-                React.createElement("button", {id: "add-story-btn", type: "submit", className: "btn btn-block btn-default btn-success"}, "Add")
+                React.createElement("div", {className: "well"}, 
+                    React.createElement("p", null, 
+                        React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
+                        React.createElement("input", {ref: "querystringInput", type: "text", placeholder: "Type any sentence to see it's named entity visualisation", 
+                               className: "form-control", 
+                               onChange: (e)=>this.setState({querystring: e.target.value})}
+                        )
+                    ), 
+                    React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Visualise")
+                ), 
+                React.createElement("br", null), 
+                React.createElement("div", {className: "well"}, 
+                    React.createElement("h4", null, React.createElement("div", {dangerouslySetInnerHTML: {__html: children}}))
+                )
             )
         );
     }
 });
 
 ReactDOM.render(
-    React.createElement(StoryApp, null), document.getElementById("div-stories-table")
+    React.createElement(InnerStoryApp, null), document.getElementById('div-visualisation-content')
 );
 
 },{"react":177,"react-dom":26}]},{},[178]);

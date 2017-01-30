@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <div id="div-inner-story-content"></div>
+    <div id="div-visualisation-content"></div>
 {% endblock content %}
 
 {% load static %}
@@ -14,7 +14,7 @@
     <script>
         var STORY_URL = "{% url 'stories_view' %}";
         var STORY_NAME = "{{ story_name }}";
-        var API_URL = "/api/stories/" + "{{ story_name }}" + "/queries/";
+        var API_URL = "/api/stories/" + "{{ story_name }}" + "/";
     </script>
-    <script src="{% static 'js/inner-stories.js' %}"></script>
+    <script src="{% static 'js/visualisation.js' %}"></script>
 {% endblock %}

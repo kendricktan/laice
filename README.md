@@ -1,11 +1,4 @@
 <p align="center">
-  <a href="#">
-    <img alt="laice" src="https://i.imgur.com/HmvI1JP.png" width="128"><br/>    
-  </a>
-  <sub>Icon by <a href="http://www.flaticon.com/authors/simpleicon">simpleicons</a></sub>
-</p>
-
-<p align="center">
     Train your own Natural Language Processor straight from your browser!
 </p>
 
@@ -13,12 +6,12 @@
 ---
 
 ## What?
-Laice allows you to build, train, and classify your own sentences via a Web UI. 
-Laice can also communicate with your applications through a RESTful API.
+Karman allows you to build, train, and classify your own sentences via a Web UI. 
+Karman can also communicate with your applications through a RESTful API.
 
-In other words, laice aims to be a free, open sourced alternative to  <a href="http://wit.ai">api.ai</a>, <a href="http://wit.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a>
+In other words, karman aims to be a free, open sourced alternative to  <a href="http://wit.ai">api.ai</a>, <a href="http://wit.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a>
 
-Laice turns words into meanings (with enough training data), for example:
+Karman turns words into meanings (with enough training data), for example:
 
 - `Jack lives in Berlin` -> `{'person': 'Jack', 'location': 'Berlin'}`
 - `Tutu really likes bananas` -> `{'person': 'Tutu', 'food': 'bananas'}`
@@ -29,8 +22,8 @@ Laice turns words into meanings (with enough training data), for example:
 ## Getting started
 
 ```
-git clone https://github.com/kendricktan/laice.git
-cd laice
+git clone https://github.com/navnn/karman.git
+cd karman
 
 npm install -g bower
 bower install

@@ -6,7 +6,7 @@ var ReactDOM = require("react-dom");
 
 /* Inner story main app */
 var InnerStoryApp = React.createClass({
-    getInitialState: function () {
+    getInitialState: function () { 
         return {
             // Contains a list of attributes
             attributeList: [],
@@ -167,6 +167,13 @@ var InnerStoryApp = React.createClass({
                 </div>
 
                 <br/>
+                
+                <ul className="nav nav-pills nav-justified">
+                    <li className="active"><a href="#">Train</a></li>
+                    <li><a href="see">See</a></li>
+                </ul>
+        
+                <br/>
 
                 <div className="well">
                     <h2>Attributes</h2>
@@ -303,6 +310,8 @@ var InnerStoryHeader = React.createClass({
                 <a href={STORY_URL}>Stories</a>
                 &nbsp; &gt; &nbsp;
                 <a href={STORY_URL + STORY_NAME}>{STORY_NAME}</a>
+                &nbsp; &gt; &nbsp;
+                <a target="_blank" href={API_URL}>api</a>
             </h3>
         )
     }
@@ -336,7 +345,7 @@ var AttributeApp = React.createClass({
                     <thead>
                     <tr>
                         <th>Attribute</th>
-                        <th>Action</th>
+                        <th className="lastColumn">Action</th>
                     </tr>
                     </thead>
                     <AttributeList attributeList={this.props.attributeList}
@@ -388,7 +397,7 @@ var Attribute = React.createClass({
         return (
             <tr>
                 <td>{ this.props.attributeName }</td>
-                <td>
+                <td  className="lastColumn">
                     <button type="button" className="btn btn-danger"
                             onClick={this.handleAttributeRemove}>
                         Delete
@@ -485,7 +494,7 @@ var ManualQuery = React.createClass({
             <form onSubmit={this.handleSubmit}>
                 <p>
                     <p><span className="label label-warning">{this.state.labelText}</span></p>
-                    <input ref="querystringInput" type="text" placeholder="'Turn the temperature down by 2 degrees'"
+                    <input ref="querystringInput" type="text" placeholder="'Your text here'"
                            className="form-control"
                            onChange={(e)=>this.setState({querystring: e.target.value})}
                     />
@@ -540,7 +549,7 @@ var QueryList = React.createClass({
                         <tr>
                             <th>Text</th>
                             <th>Attribute</th>
-                            <th>Action</th>
+                            <th className="lastColumn">Action</th>
                         </tr>
                         </thead>
 
@@ -650,7 +659,7 @@ var QueryNER = React.createClass({
             <tr>
                 <td scope="row">{ this.props.targetText }</td>
                 <td>{ this.props.targetAttribute }</td>
-                <td>
+                <td className="lastColumn">
                     <button type="button" className="btn btn-danger"
                             onClick={(e)=>this.onNERRemove(this.props.targetText)}>
                         Delete
@@ -704,7 +713,12 @@ var QueryNewNER = React.createClass({
         return (
             <tr>
                 <th>
-                    <QueryTargetTextSelect
+                {/* 15-Jan-2017 - NAV - Replacing text select to text free form entry */}
+                {/* <QueryTargetTextSelect
+                     handleNERSelectTargetText={this.onNERSelectTargetText}
+                     querystring={this.props.querystring}
+                 /> */}
+                 <QueryTargetTextEnter
                         handleNERSelectTargetText={this.onNERSelectTargetText}
                         querystring={this.props.querystring}
                     />
@@ -715,7 +729,7 @@ var QueryNewNER = React.createClass({
                                           attributeList={this.props.attributeList}/>
                     <p><span className="label label-warning">{this.state.labelAttribute}</span></p>
                 </th>
-                <th>
+                <th className="lastColumn">
                     <button type="button" className="btn btn-success"
                             onClick={this.onNERSubmit}>Add
                     </button>
@@ -741,6 +755,20 @@ var QueryTargetTextSelect = React.createClass({
                     }.bind(this))
                 }
             </select>
+        )
+    }
+});
+
+// 15/Jan/2017 - NAV - Created new class for entering text for Text instead of having to select
+// Query target text free form entry
+var QueryTargetTextEnter = React.createClass({
+    onValueChange: function (val) {
+        this.props.handleNERSelectTargetText(val);
+    },
+
+    render: function () {
+        return (
+            <input type="text" className="form-control" onChange={(e)=>this.onValueChange(e.target.value)} ></input>
         )
     }
 });
