@@ -345,7 +345,7 @@ var AttributeApp = React.createClass({
                     <thead>
                     <tr>
                         <th>Attribute</th>
-                        <th>Action</th>
+                        <th className="lastColumn">Action</th>
                     </tr>
                     </thead>
                     <AttributeList attributeList={this.props.attributeList}
@@ -397,7 +397,7 @@ var Attribute = React.createClass({
         return (
             <tr>
                 <td>{ this.props.attributeName }</td>
-                <td>
+                <td  className="lastColumn">
                     <button type="button" className="btn btn-danger"
                             onClick={this.handleAttributeRemove}>
                         Delete
@@ -549,7 +549,7 @@ var QueryList = React.createClass({
                         <tr>
                             <th>Text</th>
                             <th>Attribute</th>
-                            <th>Action</th>
+                            <th className="lastColumn">Action</th>
                         </tr>
                         </thead>
 
@@ -659,7 +659,7 @@ var QueryNER = React.createClass({
             <tr>
                 <td scope="row">{ this.props.targetText }</td>
                 <td>{ this.props.targetAttribute }</td>
-                <td>
+                <td className="lastColumn">
                     <button type="button" className="btn btn-danger"
                             onClick={(e)=>this.onNERRemove(this.props.targetText)}>
                         Delete
@@ -729,7 +729,7 @@ var QueryNewNER = React.createClass({
                                           attributeList={this.props.attributeList}/>
                     <p><span className="label label-warning">{this.state.labelAttribute}</span></p>
                 </th>
-                <th>
+                <th className="lastColumn">
                     <button type="button" className="btn btn-success"
                             onClick={this.onNERSubmit}>Add
                     </button>
@@ -768,7 +768,7 @@ var QueryTargetTextEnter = React.createClass({
 
     render: function () {
         return (
-            <input type="text" onChange={(e)=>this.onValueChange(e.target.value)} ></input>
+            <input type="text" className="form-control" onChange={(e)=>this.onValueChange(e.target.value)} ></input>
         )
     }
 });

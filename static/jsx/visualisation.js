@@ -86,9 +86,7 @@ var InnerStoryApp = React.createClass({
         
                 <br/>
 
-                <div className="well">
-                    <ManualQuery refreshQueries={this.refreshQueries} onQueryListAdd={this.handleQueryListAdd}/>
-                </div>
+                <ManualQuery refreshQueries={this.refreshQueries} onQueryListAdd={this.handleQueryListAdd}/>
         
                 <br/>
             </div>
@@ -246,15 +244,20 @@ var ManualQuery = React.createClass({
         var children = this.markText(this.entitystring, this.parsed_ner);
         return (
             <form onSubmit={this.handleSubmit}>
-                <p>
-                    <p><span className="label label-warning">{this.state.labelText}</span></p>
-                    <input ref="querystringInput" type="text" placeholder="'Your text here'"
-                           className="form-control"
-                           onChange={(e)=>this.setState({querystring: e.target.value})}
-                    />
-                </p>
-                <button type="submit" className="btn btn-block btn-default btn-primary">Query</button>                
-                <h4><div dangerouslySetInnerHTML={{__html: children}} /></h4>
+                <div className="well">
+                    <p>
+                        <p><span className="label label-warning">{this.state.labelText}</span></p>
+                        <input ref="querystringInput" type="text" placeholder="Type any sentence to see it's named entity visualisation"
+                               className="form-control"
+                               onChange={(e)=>this.setState({querystring: e.target.value})}
+                        />
+                    </p>
+                    <button type="submit" className="btn btn-block btn-default btn-primary">Visualise</button>
+                </div>
+                <br/>
+                <div className="well">                
+                    <h4><div dangerouslySetInnerHTML={{__html: children}} /></h4>
+                </div>
             </form>
         );
     }

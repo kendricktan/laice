@@ -59,3 +59,7 @@
     outline: 0;
     -webkit-font-smoothing: antialiased;
 }
+
+.lastColumn {
+    text-align: right;
+}

@@ -20568,9 +20568,7 @@ var InnerStoryApp = React.createClass({displayName: "InnerStoryApp",
         
                 React.createElement("br", null), 
 
-                React.createElement("div", {className: "well"}, 
-                    React.createElement(ManualQuery, {refreshQueries: this.refreshQueries, onQueryListAdd: this.handleQueryListAdd})
-                ), 
+                React.createElement(ManualQuery, {refreshQueries: this.refreshQueries, onQueryListAdd: this.handleQueryListAdd}), 
         
                 React.createElement("br", null)
             )
@@ -20719,7 +20717,7 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
     markText: function(str, parsed_ner) {
         if(str && parsed_ner){
             for (var item in parsed_ner)
-                str = this.strReplaceAll(' ' + str + ' ', ' ' + item + ' ', ' <mark data-entity="' + parsed_ner[item] + '">' + item + ' </mark> ');  
+                str = this.strReplaceAll(' ' + str + ' ', ' ' + item + ' ', ' <mark data-entity="' + parsed_ner[item] + '">' + item + '</mark> ');  
         }
         return str;
     },
@@ -20728,15 +20726,20 @@ var ManualQuery = React.createClass({displayName: "ManualQuery",
         var children = this.markText(this.entitystring, this.parsed_ner);
         return (
             React.createElement("form", {onSubmit: this.handleSubmit}, 
-                React.createElement("p", null, 
-                    React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
-                    React.createElement("input", {ref: "querystringInput", type: "text", placeholder: "'Your text here'", 
-                           className: "form-control", 
-                           onChange: (e)=>this.setState({querystring: e.target.value})}
-                    )
+                React.createElement("div", {className: "well"}, 
+                    React.createElement("p", null, 
+                        React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelText)), 
+                        React.createElement("input", {ref: "querystringInput", type: "text", placeholder: "Type any sentence to see it's named entity visualisation", 
+                               className: "form-control", 
+                               onChange: (e)=>this.setState({querystring: e.target.value})}
+                        )
+                    ), 
+                    React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Visualise")
                 ), 
-                React.createElement("button", {type: "submit", className: "btn btn-block btn-default btn-primary"}, "Query"), 
-                React.createElement("h4", null, React.createElement("div", {dangerouslySetInnerHTML: {__html: children}}))
+                React.createElement("br", null), 
+                React.createElement("div", {className: "well"}, 
+                    React.createElement("h4", null, React.createElement("div", {dangerouslySetInnerHTML: {__html: children}}))
+                )
             )
         );
     }

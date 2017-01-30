@@ -20827,7 +20827,7 @@ var AttributeApp = React.createClass({displayName: "AttributeApp",
                     React.createElement("thead", null, 
                     React.createElement("tr", null, 
                         React.createElement("th", null, "Attribute"), 
-                        React.createElement("th", null, "Action")
+                        React.createElement("th", {className: "lastColumn"}, "Action")
                     )
                     ), 
                     React.createElement(AttributeList, {attributeList: this.props.attributeList, 
@@ -20879,7 +20879,7 @@ var Attribute = React.createClass({displayName: "Attribute",
         return (
             React.createElement("tr", null, 
                 React.createElement("td", null,  this.props.attributeName), 
-                React.createElement("td", null, 
+                React.createElement("td", {className: "lastColumn"}, 
                     React.createElement("button", {type: "button", className: "btn btn-danger", 
                             onClick: this.handleAttributeRemove}, 
                         "Delete"
@@ -21031,7 +21031,7 @@ var QueryList = React.createClass({displayName: "QueryList",
                         React.createElement("tr", null, 
                             React.createElement("th", null, "Text"), 
                             React.createElement("th", null, "Attribute"), 
-                            React.createElement("th", null, "Action")
+                            React.createElement("th", {className: "lastColumn"}, "Action")
                         )
                         ), 
 
@@ -21141,7 +21141,7 @@ var QueryNER = React.createClass({displayName: "QueryNER",
             React.createElement("tr", null, 
                 React.createElement("td", {scope: "row"},  this.props.targetText), 
                 React.createElement("td", null,  this.props.targetAttribute), 
-                React.createElement("td", null, 
+                React.createElement("td", {className: "lastColumn"}, 
                     React.createElement("button", {type: "button", className: "btn btn-danger", 
                             onClick: (e)=>this.onNERRemove(this.props.targetText)}, 
                         "Delete"
@@ -21211,7 +21211,7 @@ var QueryNewNER = React.createClass({displayName: "QueryNewNER",
                                           attributeList: this.props.attributeList}), 
                     React.createElement("p", null, React.createElement("span", {className: "label label-warning"}, this.state.labelAttribute))
                 ), 
-                React.createElement("th", null, 
+                React.createElement("th", {className: "lastColumn"}, 
                     React.createElement("button", {type: "button", className: "btn btn-success", 
                             onClick: this.onNERSubmit}, "Add"
                     )
@@ -21250,7 +21250,7 @@ var QueryTargetTextEnter = React.createClass({displayName: "QueryTargetTextEnter
 
     render: function () {
         return (
-            React.createElement("input", {type: "text", onChange: (e)=>this.onValueChange(e.target.value)})
+            React.createElement("input", {type: "text", className: "form-control", onChange: (e)=>this.onValueChange(e.target.value)})
         )
     }
 });
