@@ -16,7 +16,7 @@
 Laice allows you to build, train, and classify your own sentences via a Web UI. 
 Laice can also communicate with your applications through a RESTful API.
 
-In other words, laice aims to be a free, open sourced alternative to  <a href="http://wit.ai">api.ai</a>, <a href="http://wit.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a>
+In other words, laice aims to be a free, open sourced alternative to  <a href="http://api.ai">api.ai</a>, <a href="http://luis.ai">luis.ai</a>, and <a href="http://wit.ai">wit.ai</a>
 
 Laice turns words into meanings (with enough training data), for example:
 
