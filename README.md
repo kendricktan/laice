@@ -37,7 +37,7 @@ bower install
 
 pip3 install -r requirements.txt
 
-# Optional, doing this will yeild more accurate
+# Optional, doing this will yield more accurate
 # predictions, however will have a slower startup
 # time. Its downloading pre-processed data.
 python3 -m spacy.en.download --force all 
