@@ -1,5 +1,5 @@
 Cython==0.24.1
-Django==1.10.2
+Django==1.11.29
 django-annoying==0.10.3
 djangorestframework==3.4.7
 spacy==1.1.2
